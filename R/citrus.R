@@ -4,7 +4,6 @@
 #' 
 #' @docType package
 #' @name Citrus
-#' @useDynLib Citrus
 #' @import pamr
 #' @import glmnet
 #' @import samr

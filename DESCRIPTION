@@ -11,6 +11,4 @@ Description: Automated identification of clusters whose behavior differs
 License: GPL-3
 Imports:
     Rclusterpp,pamr,glmnet,samr,ggplot2,flowCore,igraph,survival,parallel,reshape2
-Suggests:
-    emdist,shiny,brew
 RoxygenNote: 5.0.1

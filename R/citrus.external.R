@@ -1,7 +1,3 @@
-# Slightly modified code from SPADE
-citrus.assignToCluster = function(tbl, cluster_data, cluster_assign){
-    .Call("citrus_assign",t(tbl),t(cluster_data),as.integer(cluster_assign))
-}
 
 # Slightly modified code from PAMR
 pamr.fdr.new = function (trained.obj, data, nperms = 100, xl.mode = c("regular", 

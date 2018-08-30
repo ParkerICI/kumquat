@@ -8,4 +8,3 @@
 \description{
 Automated identification of clusters whose behavior differs between sample groups.
 }
-

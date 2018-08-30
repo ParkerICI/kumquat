@@ -63,4 +63,3 @@ citrus.extractModelFeatures(cvMinima,finalModel,abundanceFeatures)
 \author{
 Robert Bruggner
 }
-

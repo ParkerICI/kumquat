@@ -4,7 +4,7 @@
 \alias{plot.citrus.full.result}
 \title{Plot a citrus.full.result}
 \usage{
-plot.citrus.full.result(citrus.full.result, outputDirectory)
+\method{plot}{citrus.full.result}(citrus.full.result, outputDirectory)
 }
 \arguments{
 \item{citrus.full.result}{A citrus.full.result object}
@@ -20,4 +20,3 @@ See \code{\link{citrus.full}} for examples.
 \author{
 Robert Bruggner
 }
-

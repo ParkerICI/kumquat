@@ -54,4 +54,3 @@ citrus.foldModels = citrus.buildFoldsEndpointModels(type="pamr",citrus.foldFeatu
 \author{
 Robert Bruggner
 }
-

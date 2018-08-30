@@ -71,10 +71,9 @@ colnames(clusterMedians) = clusteringColumns
 # Plot Clustering Hierarchy - Uncomment and Specify an output file
 # citrus.plotClusteringHierarchy(outputFile="/path/to/output.pdf",clusterColors=clusterMedians,graph=hierarchyGraph$graph,layout=hierarchyGraph$layout,plotSize=hierarchyGraph$plotSize)
 }
-\author{
-Robert Bruggner
-}
 \seealso{
 \code{\link{citrus.createHierarchyGraph}}
 }
-
+\author{
+Robert Bruggner
+}

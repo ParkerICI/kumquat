@@ -62,4 +62,3 @@ cvMinima = citrus.getCVMinima("pamr",thresholdCVRates)
 \author{
 Robert Bruggner
 }
-

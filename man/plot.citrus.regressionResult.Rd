@@ -4,7 +4,7 @@
 \alias{plot.citrus.regressionResult}
 \title{Plot results of a Citrus regression analysis}
 \usage{
-plot.citrus.regressionResult(citrus.regressionResult, outputDirectory,
+\method{plot}{citrus.regressionResult}(citrus.regressionResult, outputDirectory,
   citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet,
   plotTypes = c("errorRate", "stratifyingFeatures", "stratifyingClusters",
   "clusterGraph"), hierarchyGraph = NULL, ...)
@@ -60,4 +60,3 @@ citrus.regressionResult = citrus.endpointRegress(modelType="pamr",citrus.foldFea
 \author{
 Robert Bruggner
 }
-

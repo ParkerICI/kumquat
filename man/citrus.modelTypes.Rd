@@ -15,4 +15,3 @@ Returns valid model types that Citrus can compute.
 \author{
 Robert Bruggner
 }
-

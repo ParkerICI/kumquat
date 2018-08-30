@@ -38,10 +38,9 @@ citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
 # Select clusters that contain at least 1\% of clustered events.
 largeEnoughClusters = citrus.selectClusters(citrus.clustering,minimumClusterSizePercent=0.01)
 }
-\author{
-Robert Bruggner
-}
 \seealso{
 \code{\link{citrus.selectClusters.minimumClusterSize}}.
 }
-
+\author{
+Robert Bruggner
+}

@@ -70,4 +70,3 @@ citrus.regressionResult = citrus.endpointRegress(modelType="pamr",citrus.foldFea
 \author{
 Robert Bruggner
 }
-

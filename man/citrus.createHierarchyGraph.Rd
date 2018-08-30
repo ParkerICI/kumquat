@@ -45,4 +45,3 @@ hierarchyGraphStuff = citrus.createHierarchyGraph(citrus.clustering,selectedClus
 \author{
 Robert Bruggner
 }
-

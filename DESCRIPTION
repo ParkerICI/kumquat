@@ -10,5 +10,5 @@ Description: Automated identification of clusters whose behavior differs
     between sample groups.
 License: GPL-3
 Imports:
-    Rclusterpp,pamr,glmnet,samr,ggplot2,flowCore,igraph,survival,parallel,reshape2
-RoxygenNote: 5.0.1
+    pamr,glmnet,samr,ggplot2,flowCore,igraph,survival,parallel,reshape2
+RoxygenNote: 6.0.1

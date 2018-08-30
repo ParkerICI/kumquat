@@ -25,25 +25,6 @@ citrus.plotClusters(clusterIds, clusterAssignments, citrus.combinedFCSSet,
 \description{
 Plot expression of markers in cluster cells relative to all cells
 }
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# Create list of files to be analyzed
-fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-
-# Read the data 
-citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# Cluster data
-citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-
-# Plot clusters
-citrus.plotClusters(clusterIds=c(19998,19997),clusterAssignments=citrus.clustering$clusterMembership,citrus.combinedFCSSet,clusteringColumns)
-}
 \author{
 Robert Bruggner
 }

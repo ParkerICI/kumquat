@@ -11,26 +11,6 @@
 #' 
 #' @author Robert Bruggner
 #' @export
-#' @seealso \code{\link{citrus.selectClusters.minimumClusterSize}}.
-#' 
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Select clusters that contain at least 1% of clustered events.
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering,minimumClusterSizePercent=0.01)
 citrus.selectClusters = function(citrus.clustering,method="minimumClusterSize",...){
   do.call(paste0("citrus.selectClusters.",method),args=list(citrus.clustering=citrus.clustering,...))
 }
@@ -48,25 +28,6 @@ citrus.selectClusters = function(citrus.clustering,method="minimumClusterSize",.
 #' 
 #' @author Robert Bruggner
 #' @export
-#' @seealso \code{\link{citrus.selectClusters}}
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Select clusters that contain at least 1% of clustered events.
-#' largeEnoughClusters = citrus.selectClusters.minimumClusterSize(citrus.clustering,minimumClusterSizePercent=0.01)
 citrus.selectClusters.minimumClusterSize =function(citrus.clustering,minimumClusterSizePercent=0.05,...){
   clusterSizes = sapply(citrus.clustering$clusterMembership,length)
   minimumClusterSize = (length(citrus.clustering$clusterMembership)+1)*minimumClusterSizePercent

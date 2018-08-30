@@ -26,31 +26,6 @@ A list of models, one model fit on each fold's feature set.
 \description{
 Builds a model from features derived from each independent fold of clustering.
 }
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# Create list of files to be analyzed
-fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-
-# Read the data 
-citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-
-# List disease group of each sample
-labels = factor(rep(c("Healthy","Diseased"),each=10))
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# Cluster each fold
-citrus.foldClustering = citrus.clusterAndMapFolds(citrus.combinedFCSSet,clusteringColumns,labels,nFolds=4)
-
-# Build fold features and leftout features
-citrus.foldFeatureSet = citrus.calculateFoldFeatureSet(citrus.foldClustering,citrus.combinedFCSSet)
-
-# Build fold models 
-citrus.foldModels = citrus.buildFoldsEndpointModels(type="pamr",citrus.foldFeatureSet,labels)
-}
 \author{
 Robert Bruggner
 }

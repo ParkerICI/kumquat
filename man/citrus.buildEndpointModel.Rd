@@ -45,34 +45,6 @@ An object of class \code{citrus.endpointModel} with properties:
 \description{
 This function constructs an endpoint model using features calculated by citrus.
 }
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# Create list of files to be analyzed
-fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-
-# Read the data 
-citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# Cluster data
-citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-
-# Large enough clusters
-largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-
-# Build features
-abundanceFeatures = citrus.calculateFeatures(citrus.combinedFCSSet,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-
-# List disease group of each sample
-labels = factor(rep(c("Healthy","Diseased"),each=10))
-
-# Build model
-endpointModel = citrus.buildEndpointModel(abundanceFeatures,labels)
-}
 \author{
 Robert Bruggner
 }

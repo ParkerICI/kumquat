@@ -17,33 +17,6 @@
 #' 
 #' @author Robert Bruggner
 #' @export
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Large enough clusters
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-#' 
-#' # Build features
-#' abundanceFeatures = citrus.calculateFeatures(citrus.combinedFCSSet,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Build model
-#' endpointModel = citrus.buildEndpointModel(abundanceFeatures,labels)
 citrus.buildEndpointModel = function(features,labels,family="classification",type="pamr",regularizationThresholds=NULL,...){
   if (is.null(regularizationThresholds)){
     regularizationThresholds = citrus.generateRegularizationThresholds(features=features,labels=labels,modelType=type,family=family,...)
@@ -76,34 +49,6 @@ print.citrus.endpointModel = function(citrus.endpointModel,...){
 #' 
 #' @author Robert Bruggner
 #' @export
-#' 
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Large enough clusters
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-#' 
-#' # Build features
-#' abundanceFeatures = citrus.calculateFeatures(citrus.combinedFCSSet,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Calculate regularization thresholds
-#' regularizationThresholds = citrus.generateRegularizationThresholds(abundanceFeatures,labels,modelType="pamr",family="classification")
 citrus.generateRegularizationThresholds = function(features,labels,modelType,family,n=100,...){
   do.call(paste0("citrus.generateRegularizationThresholds.",family),args=list(features=features,labels=labels,modelType=modelType,n=n,...=...))
 }
@@ -133,76 +78,6 @@ citrus.generateRegularizationThresholds = function(features,labels,modelType,fam
 #' 
 #' @author Robert Bruggner
 #' @export 
-#' 
-#' @examples
-#' ########################################
-#' # Example of citrus.thresholdCVs.quick
-#' ########################################
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Large enough clusters
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-#' 
-#' # Build features
-#' abundanceFeatures = citrus.calculateFeatures(citrus.combinedFCSSet,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Calculate regularization thresholds
-#' regularizationThresholds = citrus.generateRegularizationThresholds.classification(abundanceFeatures,labels,modelType="pamr")
-#' 
-#' # Calculate CV Error rates
-#' thresholdCVRates = citrus.thresholdCVs.quick("pamr",abundanceFeatures,labels,regularizationThresholds,family="classification") 
-#' 
-#' ########################################
-#' # Example of citrus.thresholdCVs
-#' ########################################
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster each fold
-#' citrus.foldClustering = citrus.clusterAndMapFolds(citrus.combinedFCSSet,clusteringColumns,labels,nFolds=4)
-#' 
-#' # Build fold features and leftout features
-#' citrus.foldFeatureSet = citrus.calculateFoldFeatureSet(citrus.foldClustering,citrus.combinedFCSSet)
-#' 
-#' # Build fold models 
-#' citrus.foldModels = citrus.buildFoldsEndpointModels(type="pamr",citrus.foldFeatureSet,labels)
-#' 
-#' citrus.thresholdCVs(modelType="pamr",
-#'                     foldFeatures=citrus.foldFeatureSet$foldFeatures,
-#'                     labels=labels,
-#'                     regularizationThresholds=citrus.foldModels[[1]]$regularizationThresholds,
-#'                     family="classification",
-#'                     folds=citrus.foldFeatureSet$folds,
-#'                     foldModels=citrus.foldModels,
-#'                     leftoutFeatures=citrus.foldFeatureSet$leftoutFeatures)
 citrus.thresholdCVs = function(modelType,foldFeatures,labels,regularizationThresholds,family,folds,foldModels,leftoutFeatures,...){
   if (modelType=="sam"){
     return(NULL)
@@ -239,45 +114,6 @@ citrus.thresholdCVs.quick = function(modelType,features,labels,regularizationThr
 #' 
 #' @author Robert Bruggner
 #' @export
-#' 
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # List of files to be clustered
-#' fileList1 = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs")[seq(from=2,to=20,by=2)])
-#' 
-#' # List of files to be mapped
-#' fileList2 = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs")[seq(from=1,to=19,by=2)])
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet1 = citrus.readFCSSet(dataDirectory,fileList1)
-#' citrus.combinedFCSSet2 = citrus.readFCSSet(dataDirectory,fileList2)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster first dataset
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet1,clusteringColumns)
-#' 
-#' # Map new data to exsting clustering
-#' citrus.mapping = citrus.mapToClusterSpace(citrus.combinedFCSSet.new=citrus.combinedFCSSet2,citrus.combinedFCSSet.old=citrus.combinedFCSSet1,citrus.clustering)
-#' 
-#' # Large Enough Clusters 
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-#' 
-#' # Clustered Features and mapped features
-#' clusteredFeatures = citrus.calculateFeatures(citrus.combinedFCSSet1,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-#' mappedFeatures = citrus.calculateFeatures(citrus.combinedFCSSet2,clusterAssignments=citrus.mapping$clusterMembership,clusterIds=largeEnoughClusters)
-#' 
-#' # Labels
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Build Endpoint Model 
-#' citrus.endpointModel = citrus.buildEndpointModel(clusteredFeatures,labels[seq(from=2,to=20,by=2)])
-#' 
-#' # Predict
-#' citrus.predict(citrus.endpointModel,newFeatures=mappedFeatures)
 citrus.predict = function(citrus.endpointModel,newFeatures){
   do.call(paste0("citrus.predict.",citrus.endpointModel$family),args=list(citrus.endpointModel=citrus.endpointModel,newFeatures=newFeatures))
 }
@@ -297,30 +133,6 @@ citrus.predict = function(citrus.endpointModel,newFeatures){
 #' 
 #' @author Robert Bruggner
 #' @export
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster each fold
-#' citrus.foldClustering = citrus.clusterAndMapFolds(citrus.combinedFCSSet,clusteringColumns,labels,nFolds=4)
-#' 
-#' # Build fold features and leftout features
-#' citrus.foldFeatureSet = citrus.calculateFoldFeatureSet(citrus.foldClustering,citrus.combinedFCSSet)
-#' 
-#' # Build fold models 
-#' citrus.foldModels = citrus.buildFoldsEndpointModels(type="pamr",citrus.foldFeatureSet,labels)
 citrus.buildFoldsEndpointModels = function(type,citrus.foldFeatureSet,labels,regularizationThresholds=NULL,family="classification",...){
   
   if (is.null(regularizationThresholds)){
@@ -379,31 +191,6 @@ citrus.buildFoldEndpointModel = function(foldIndex,folds,foldFeatures,labels,fam
 #' 
 #' @author Robert Bruggner
 #' @export
-#' 
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Cluster data
-#' citrus.foldClustering = citrus.clusterAndMapFolds(citrus.combinedFCSSet,clusteringColumns,labels,nFolds=4)
-#' 
-#' # Build abundance features
-#' citrus.foldFeatureSet = citrus.calculateFoldFeatureSet(citrus.foldClustering,citrus.combinedFCSSet)
-#' 
-#' # Endpoint regress
-#' citrus.regressionResult = citrus.endpointRegress(modelType="pamr",citrus.foldFeatureSet,labels,family="classification")
 citrus.endpointRegress = function(modelType,citrus.foldFeatureSet,labels,family,...){
     
   if (nrow(citrus.foldFeatureSet$allFeatures)!=length(labels)){
@@ -478,40 +265,6 @@ citrus.endpointRegress = function(modelType,citrus.foldFeatureSet,labels,family,
 #' 
 #' @author Robert Bruggner
 #' @export
-#' 
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Large enough clusters
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-#' 
-#' # Build features
-#' abundanceFeatures = citrus.calculateFeatures(citrus.combinedFCSSet,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Calculate regularization thresholds
-#' regularizationThresholds = citrus.generateRegularizationThresholds(abundanceFeatures,labels,modelType="pamr",family="classification")
-#' 
-#' # Calculate CV Error rates
-#' thresholdCVRates = citrus.thresholdCVs.quick("pamr",abundanceFeatures,labels,regularizationThresholds,family="classification") 
-#' 
-#' # Get pre-selected CV Minima
-#' cvMinima = citrus.getCVMinima("pamr",thresholdCVRates)
 citrus.getCVMinima = function(modelType,thresholdCVRates,fdrRate=0.01){
   cvPoints=list();
   if (modelType=="sam"){
@@ -552,46 +305,6 @@ citrus.getCVMinima = function(modelType,thresholdCVRates,fdrRate=0.01){
 #' 
 #' @author Robert Bruggner
 #' @export
-#' 
-#' @examples
-#' # Where the data lives
-#' dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-#' 
-#' # Create list of files to be analyzed
-#' fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-#' 
-#' # Read the data 
-#' citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-#' 
-#' # List of columns to be used for clustering
-#' clusteringColumns = c("Red","Blue")
-#' 
-#' # Cluster data
-#' citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-#' 
-#' # Large enough clusters
-#' largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-#' 
-#' # Build features
-#' abundanceFeatures = citrus.calculateFeatures(citrus.combinedFCSSet,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-#' 
-#' # List disease group of each sample
-#' labels = factor(rep(c("Healthy","Diseased"),each=10))
-#' 
-#' # Calculate regularization thresholds
-#' regularizationThresholds = citrus.generateRegularizationThresholds(abundanceFeatures,labels,modelType="pamr",family="classification")
-#' 
-#' # Calculate CV Error rates
-#' thresholdCVRates = citrus.thresholdCVs.quick("pamr",abundanceFeatures,labels,regularizationThresholds,family="classification") 
-#' 
-#' # Get pre-selected CV Minima
-#' cvMinima = citrus.getCVMinima("pamr",thresholdCVRates)
-#' 
-#' # Build Final Model
-#' finalModel = citrus.buildEndpointModel(abundanceFeatures,labels,family="classification",type="pamr",regularizationThresholds)
-#' 
-#' # Get model features
-#' citrus.extractModelFeatures(cvMinima,finalModel,abundanceFeatures)
 citrus.extractModelFeatures = function(cvMinima,finalModel,finalFeatures){
   res = list();
   modelType = finalModel$type
@@ -604,7 +317,7 @@ citrus.extractModelFeatures = function(cvMinima,finalModel,finalFeatures){
         f = pamr.listgenes(fit=finalModel,data=list(x=t(finalFeatures),geneids=colnames(finalFeatures)),threshold=threshold)  
         f = as.vector(f[,1])
         res[[cvPoint]][["features"]] = f
-        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split=" "))[,2])))  
+        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  
       } else {
         res[[cvPoint]][["features"]] = NULL
         res[[cvPoint]][["clusters"]] = NULL
@@ -619,7 +332,7 @@ citrus.extractModelFeatures = function(cvMinima,finalModel,finalFeatures){
       }
       if (length(f)>0){
         res[[cvPoint]][["features"]] = f
-        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split=" "))[,2])))  
+        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  
       } else {
         res[[cvPoint]][["features"]] = NULL;
         res[[cvPoint]][["clusters"]] = NULL;
@@ -631,7 +344,7 @@ citrus.extractModelFeatures = function(cvMinima,finalModel,finalFeatures){
       if (length(f)>0){
         #sigGenes = sigGenes[order(abs(as.numeric(sigGenes[,"Fold Change"]))),,drop=F]
         res[[cvPoint]][["features"]] = f
-        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split=" "))[,2])))  
+        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  
       } else {
         res[[cvPoint]][["features"]] = NULL;
         res[[cvPoint]][["clusters"]] = NULL;

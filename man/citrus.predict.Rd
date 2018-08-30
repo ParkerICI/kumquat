@@ -26,45 +26,6 @@ Matrix of predicted sample endpoints at all model regularization thresholds.
 \description{
 Predict labels of new feature set
 }
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# List of files to be clustered
-fileList1 = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs")[seq(from=2,to=20,by=2)])
-
-# List of files to be mapped
-fileList2 = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs")[seq(from=1,to=19,by=2)])
-
-# Read the data 
-citrus.combinedFCSSet1 = citrus.readFCSSet(dataDirectory,fileList1)
-citrus.combinedFCSSet2 = citrus.readFCSSet(dataDirectory,fileList2)
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# Cluster first dataset
-citrus.clustering = citrus.cluster(citrus.combinedFCSSet1,clusteringColumns)
-
-# Map new data to exsting clustering
-citrus.mapping = citrus.mapToClusterSpace(citrus.combinedFCSSet.new=citrus.combinedFCSSet2,citrus.combinedFCSSet.old=citrus.combinedFCSSet1,citrus.clustering)
-
-# Large Enough Clusters 
-largeEnoughClusters = citrus.selectClusters(citrus.clustering)
-
-# Clustered Features and mapped features
-clusteredFeatures = citrus.calculateFeatures(citrus.combinedFCSSet1,clusterAssignments=citrus.clustering$clusterMembership,clusterIds=largeEnoughClusters)
-mappedFeatures = citrus.calculateFeatures(citrus.combinedFCSSet2,clusterAssignments=citrus.mapping$clusterMembership,clusterIds=largeEnoughClusters)
-
-# Labels
-labels = factor(rep(c("Healthy","Diseased"),each=10))
-
-# Build Endpoint Model 
-citrus.endpointModel = citrus.buildEndpointModel(clusteredFeatures,labels[seq(from=2,to=20,by=2)])
-
-# Predict
-citrus.predict(citrus.endpointModel,newFeatures=mappedFeatures)
-}
 \author{
 Robert Bruggner
 }

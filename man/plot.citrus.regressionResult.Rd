@@ -7,7 +7,7 @@
 \method{plot}{citrus.regressionResult}(citrus.regressionResult, outputDirectory,
   citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet,
   plotTypes = c("errorRate", "stratifyingFeatures", "stratifyingClusters",
-  "clusterGraph"), hierarchyGraph = NULL, ...)
+  "clusterGraph"), ...)
 }
 \arguments{
 \item{citrus.regressionResult}{A \code{citrus.regressionResult} object.}
@@ -28,34 +28,6 @@
 }
 \description{
 Makes many plots showing results of a Citrus analysis
-}
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# Create list of files to be analyzed
-fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-
-# Read the data 
-citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# List disease group of each sample
-labels = factor(rep(c("Healthy","Diseased"),each=10))
-
-# Cluster data
-citrus.foldClustering = citrus.clusterAndMapFolds(citrus.combinedFCSSet,clusteringColumns,nFolds=1)
-
-# Build abundance features
-citrus.foldFeatureSet = citrus.calculateFoldFeatureSet(citrus.foldClustering,citrus.combinedFCSSet)
-
-# Endpoint regress
-citrus.regressionResult = citrus.endpointRegress(modelType="pamr",citrus.foldFeatureSet,labels,family="classification")
-
-# Plot results
-# plot(citrus.regressionResult,outputDirectory,"/path/to/output/directory/",citrus.foldClustering,citrus.foldFeatureSet,citrus.combinedFCSSet)
 }
 \author{
 Robert Bruggner

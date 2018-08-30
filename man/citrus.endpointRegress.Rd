@@ -42,31 +42,6 @@ cross-validation is used to select final regularization thresholds based on feat
 of how regularization thresholds are selected, the final reported features are from the final model constructed from all features, constrained by 
 identified optimal regularization thresholds.
 }
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# Create list of files to be analyzed
-fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-
-# Read the data 
-citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# List disease group of each sample
-labels = factor(rep(c("Healthy","Diseased"),each=10))
-
-# Cluster data
-citrus.foldClustering = citrus.clusterAndMapFolds(citrus.combinedFCSSet,clusteringColumns,labels,nFolds=4)
-
-# Build abundance features
-citrus.foldFeatureSet = citrus.calculateFoldFeatureSet(citrus.foldClustering,citrus.combinedFCSSet)
-
-# Endpoint regress
-citrus.regressionResult = citrus.endpointRegress(modelType="pamr",citrus.foldFeatureSet,labels,family="classification")
-}
 \author{
 Robert Bruggner
 }

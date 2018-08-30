@@ -19,28 +19,6 @@ A vector of cluster IDs.
 \description{
 Selects clusters from a set of clusters identified by a clustering method investigate for stratifying signal.
 }
-\examples{
-# Where the data lives
-dataDirectory = file.path(system.file(package = "citrus"),"extdata","example1")
-
-# Create list of files to be analyzed
-fileList = data.frame("unstim"=list.files(dataDirectory,pattern=".fcs"))
-
-# Read the data 
-citrus.combinedFCSSet = citrus.readFCSSet(dataDirectory,fileList)
-
-# List of columns to be used for clustering
-clusteringColumns = c("Red","Blue")
-
-# Cluster data
-citrus.clustering = citrus.cluster(citrus.combinedFCSSet,clusteringColumns)
-
-# Select clusters that contain at least 1\% of clustered events.
-largeEnoughClusters = citrus.selectClusters(citrus.clustering,minimumClusterSizePercent=0.01)
-}
-\seealso{
-\code{\link{citrus.selectClusters.minimumClusterSize}}.
-}
 \author{
 Robert Bruggner
 }

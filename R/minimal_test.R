@@ -13,10 +13,10 @@ minimal_test <- function() {
     
     
     ff <- convert_to_citrus_featureset(kk, "sample")
-    run_citrus_analysis(ff, metadata.tab$label, "./", "sam")
+    sam.model <- run_citrus_analysis(ff, metadata.tab$label, "./", "sam")
     
     message("#########################")
     
-    run_citrus_analysis(ff, metadata.tab$label, "./", "pamr")
+    pam.model <- run_citrus_analysis(ff, metadata.tab$label, "./", "pamr")
     
 }

@@ -151,6 +151,7 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
 
 citrus.plotModelDifferentialFeatures.classification <- function(differentialFeatures, 
     features, modelOutputDirectory, labels, ...) {
+ 
     for (cvPoint in names(differentialFeatures)) {
         nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
         
@@ -165,11 +166,16 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
         pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", 
             replacement = "_", x = cvPoint), ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 
             1.5)
-        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = factor(labels), y = value)) + 
-            ggplot2::facet_wrap(~variable, ncol = 1) + ggplot2::geom_boxplot(outlier.colour = rgb(0, 
-            0, 0, 0), colour = rgb(0, 0, 0, 0.3)) + ggplot2::geom_point(ggplot2::aes(color = factor(labels)), 
-            alpha = I(0.25), shape = 19, size = I(2)) + ggplot2::coord_flip() + ggplot2::theme_bw() + 
-            ggplot2::ylab("") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none"))
+        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = factor(labels), y = value)) 
+                + ggplot2::facet_wrap(~variable, ncol = 1) 
+                + ggplot2::geom_boxplot(outlier.colour = rgb(0, 0, 0, 0), colour = rgb(0, 0, 0, 0.3)) 
+                + ggplot2::geom_point(ggplot2::aes(color = factor(labels)), alpha = I(0.25), shape = 19, size = I(2)) 
+                + ggplot2::coord_flip() 
+                + ggplot2::theme_bw() 
+                + ggplot2::ylab("") 
+                + ggplot2::xlab("") 
+                + ggplot2::theme(legend.position = "none")
+        )
         if (any(grepl(pattern = "abundance", nonzeroFeatureNames))) {
             p <- p + ggplot2::scale_y_log10() + ggplot2::ylab("Log10 scale")
         }
@@ -194,9 +200,14 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
         pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", 
             replacement = "_", x = cvPoint), ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 
             1.5)
-        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = value, y = labels)) + ggplot2::facet_wrap(~variable, 
-            ncol = 1) + ggplot2::geom_point(size = I(2)) + ggplot2::theme_bw() + 
-            ggplot2::ylab("") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none"))
+        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = value, y = labels)) 
+                + ggplot2::facet_wrap(~variable, ncol = 1) 
+                + ggplot2::geom_point(size = I(2)) 
+                + ggplot2::theme_bw() 
+                + ggplot2::ylab("") 
+                + ggplot2::xlab("") 
+                + ggplot2::theme(legend.position = "none")
+        )
         if (any(grepl(pattern = "abundance", nonzeroFeatureNames))) {
             p <- p + ggplot2::scale_x_log10() + ggplot2::xlab("Log10 scale")
         }
@@ -212,14 +223,16 @@ citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
         combined <- rbind(combined, cbind(melt(clusterDataList[[clusterName]], varnames = c("row", 
             "marker")), clusterId = clusterName, src = "Cluster"))
     }
-    p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., 
-        fill = src)) + ggplot2::geom_density() + ggplot2::facet_grid(clusterId ~ 
-        marker, scales = "free") + ggplot2::geom_density(data = cbind(reshape2::melt(backgroundData, 
-        varnames = c("row", "marker")), src = "Background")) + ggplot2::theme_bw() + 
-        ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), 
-            Cluster = rgb(1, 0.3, 0.3, 0.5))) + ggplot2::theme(legend.position = "bottom", 
-        axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.title = element_blank()) + 
-        ggplot2::labs(fill = "Distribution:"))
+    p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., fill = src)) 
+            + ggplot2::geom_density() 
+            + ggplot2::facet_grid(clusterId ~ marker, scales = "free") 
+            + ggplot2::geom_density(data = cbind(reshape2::melt(backgroundData, varnames = c("row", "marker")), src = "Background")) 
+            + ggplot2::theme_bw() 
+            + ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), Cluster = rgb(1, 0.3, 0.3, 0.5))) 
+            + ggplot2::theme(legend.position = "bottom", axis.text.y = ggplot2::element_blank(), 
+                axis.ticks.y = ggplot2::element_blank(), axis.title = ggplot2::element_blank()) 
+            + ggplot2::labs(fill = "Distribution:")
+        )
     print(p)
 }
 

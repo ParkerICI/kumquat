@@ -51,7 +51,7 @@ pamr.fdr.new = function (trained.obj, data, nperms = 100, xl.mode = c("regular",
     ystar <- sample(y)
     data2 <- data
     data2$y <- ystar
-    foo <- pamr.train(data2, threshold = 0, scale.sd = trained.obj$scale.sd, remove.zeros=F,
+    foo <- pamr::pamr.train(data2, threshold = 0, scale.sd = trained.obj$scale.sd, remove.zeros=F,
                       threshold.scale = trained.obj$threshold.scale, se.scale = trained.obj$se.scale, 
                       offset.percent = 50, hetero = trained.obj$hetero, 
                       prior = trained.obj$prior, sign.contrast = trained.obj$sign.contrast)

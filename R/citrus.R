@@ -4,9 +4,5 @@
 #' 
 #' @docType package
 #' @name Citrus
-#' @import pamr
-#' @import glmnet
-#' @import samr
-#' @import igraph
 #' @import survival
 NULL

@@ -20,10 +20,10 @@ citrus.buildModel.continuous = function(features,labels,type,regularizationThres
   }
   
   if (type=="glmnet") {
-    model = glmnet(x=features,y=labels,family="gaussian",lambda=regularizationThresholds,alpha=alpha,standardize=standardize)
+    model = glmnet::glmnet(x=features,y=labels,family="gaussian",lambda=regularizationThresholds,alpha=alpha,standardize=standardize)
   } else if (type=="sam"){
     noVarianceFeatures = apply(features,2,var)==0
-    model = SAM(x=t(features[,!noVarianceFeatures]),y=labels,resp.type="Quantitative",genenames=colnames(features[,!noVarianceFeatures]),nperms=10000)
+    model = samr::SAM(x=t(features[,!noVarianceFeatures]),y=labels,resp.type="Quantitative",genenames=colnames(features[,!noVarianceFeatures]),nperms=10000)
   } else {
     stop(paste("Type:",type,"not implemented for continuous model"));
   }
@@ -48,7 +48,7 @@ citrus.thresholdCVs.quick.continuous = function(modelType,features,labels,regula
     if ("standardize" %in% names(addtlArgs)){
       standardize=addtlArgs[["standardize"]]
     }
-    glmnetModel = cv.glmnet(x=features,y=labels,family="gaussian",lambda=regularizationThresholds,type.measure="mse",alpha=alpha,standardize=standardize)
+    glmnetModel = glmnet::cv.glmnet(x=features,y=labels,family="gaussian",lambda=regularizationThresholds,type.measure="mse",alpha=alpha,standardize=standardize)
     errorRates$cvm = glmnetModel$cvm
     errorRates$cvsd = glmnetModel$cvsd
   } else if (modelType=="sam"){
@@ -98,7 +98,7 @@ citrus.generateRegularizationThresholds.continuous = function(features,labels,mo
   }
   
   if (modelType=="glmnet"){
-    return(glmnet(x=features,y=labels,family="gaussian",alpha=alpha,nlambda=n,standardize=standardize)$lambda)
+    return(glmnet::glmnet(x=features,y=labels,family="gaussian",alpha=alpha,nlambda=n,standardize=standardize)$lambda)
   } else {
     return(NULL)
   }

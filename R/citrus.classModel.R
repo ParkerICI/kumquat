@@ -21,21 +21,21 @@ citrus.buildModel.classification = function(features,labels,type,regularizationT
   
   if (type=="pamr"){
     pamrData = list(x=t(features),y=labels)
-    model = pamr.train(data=pamrData,threshold=regularizationThresholds,remove.zeros=F)
+    model = pamr::pamr.train(data=pamrData,threshold=regularizationThresholds,remove.zeros=F)
   } else if (type=="glmnet") {
     # NOTE THAT THIS IS BINOMIAL EXPLICITLY. DOES MULTINOMIAL WORK THE SAME, IF ONLY 2 CLASSES PROVIDED?
     family="binomial"
     if (length(unique(labels))>2){
       family="multinomial"
     }
-    model = glmnet(x=features,y=labels,family=family,lambda=regularizationThresholds,alpha=alpha,standardize=standardize)
+    model = glmnet::glmnet(x=features,y=labels,family=family,lambda=regularizationThresholds,alpha=alpha,standardize=standardize)
   } else if (type=="sam"){
     family="Two class unpaired"
     if (length(unique(labels))>2){
       family="Multiclass"
     }
     noVarianceFeatures = apply(features,2,var)==0
-    model = SAM(x=t(features[,!noVarianceFeatures]),y=labels,resp.type=family,genenames=colnames(features[,!noVarianceFeatures]),nperms=10000)
+    model = samr::SAM(x=t(features[,!noVarianceFeatures]),y=labels,resp.type=family,genenames=colnames(features[,!noVarianceFeatures]),nperms=10000)
   } else {
     stop(paste("Type:",type,"not yet implemented"));
   }
@@ -52,8 +52,8 @@ citrus.thresholdCVs.quick.classification = function(modelType,features,labels,re
   
   if (modelType=="pamr"){
     pamrData = list(x=t(features),y=labels)
-    pamrModel = pamr.train(data=pamrData,threshold=regularizationThresholds,remove.zeros=F)
-    pamrCVModel = pamr.cv(fit=pamrModel,data=pamrData,nfold=nCVFolds)
+    pamrModel = pamr::pamr.train(data=pamrData,threshold=regularizationThresholds,remove.zeros=F)
+    pamrCVModel = pamr::pamr.cv(fit=pamrModel,data=pamrData,nfold=nCVFolds)
     errorRates$cvm = pamrCVModel$error
     
     cvmSD = as.vector(apply(sapply(pamrCVModel$folds,function(foldIndices,y,yhat){
@@ -61,7 +61,7 @@ citrus.thresholdCVs.quick.classification = function(modelType,features,labels,re
     },y=labels,yhat=pamrCVModel$yhat),1,sd))
     
     errorRates$cvsd = cvmSD / sqrt(length(pamrCVModel$folds))
-    errorRates$fdr =  citrus:::pamr.fdr.new(pamrModel,data=pamrData,nperms=1000)$results[,"Median FDR"]
+    errorRates$fdr =  pamr.fdr.new(pamrModel,data=pamrData,nperms=1000)$results[,"Median FDR"]
   } else if (modelType=="glmnet"){
     glmnetFamily="binomial"
     if (length(unique(labels))>2){
@@ -76,7 +76,7 @@ citrus.thresholdCVs.quick.classification = function(modelType,features,labels,re
     if ("standardize" %in% names(addtlArgs)){
       standardize=addtlArgs[["standardize"]]
     }
-    glmnetModel = cv.glmnet(x=features,y=labels,family=glmnetFamily,lambda=regularizationThresholds,type.measure="class",alpha=alpha,standardize=standardize)
+    glmnetModel = glmnet::cv.glmnet(x=features,y=labels,family=glmnetFamily,lambda=regularizationThresholds,type.measure="class",alpha=alpha,standardize=standardize)
     errorRates$cvm = glmnetModel$cvm
     errorRates$cvsd = glmnetModel$cvsd
   } else if (modelType=="sam"){
@@ -105,7 +105,7 @@ citrus.predict.classification = function(citrus.endpointModel,newFeatures){
   if (citrus.endpointModel$type=="glmnet"){
     predictions = predict(citrus.endpointModel$model,newx=newFeatures,type="class")
   } else if (citrus.endpointModel$type=="pamr"){
-    predictions = pamr.predictmany(fit=citrus.endpointModel$model,newx=t(newFeatures))$predclass
+    predictions = pamr::pamr.predictmany(fit=citrus.endpointModel$model,newx=t(newFeatures))$predclass
   } else {
     stop(paste("don't know how to predict for class",citrus.endpointModel$type));
   }
@@ -128,7 +128,7 @@ citrus.generateRegularizationThresholds.classification = function(features,label
   }
 
   if (modelType=="pamr"){
-    return(rev(pamr.train(data=list(x=t(features),y=labels),n.threshold=n)$threshold))
+    return(rev(pamr::pamr.train(data=list(x=t(features),y=labels),n.threshold=n)$threshold))
   }
   
   if (modelType=="glmnet"){
@@ -137,7 +137,7 @@ citrus.generateRegularizationThresholds.classification = function(features,label
     } else {
       glmfamily="multinomial"
     }
-    return(glmnet(x=features,y=labels,family=glmfamily,alpha=alpha,nlambda=n,standardize=standardize)$lambda)
+    return(glmnet::glmnet(x=features,y=labels,family=glmfamily,alpha=alpha,nlambda=n,standardize=standardize)$lambda)
   }
   
 }

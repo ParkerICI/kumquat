@@ -17,8 +17,8 @@ citrus.generateRegularizationThresholds.survival = function(features,labels,mode
     stop("pamr model not implemented for survival data.");
   }
   if ("glmnet" %in% modelTypes){
-    s = Surv(time=labels[,"time"],event=labels[,"event"])
-    regs$glmnet = glmnet(x=features,y=s,family="cox",alpha=alpha,nlambda=c(n-1),standardize=standardize)$lambda
+    s = survival::Surv(time=labels[,"time"],event=labels[,"event"])
+    regs$glmnet = glmnet::glmnet(x=features,y=s,family="cox",alpha=alpha,nlambda=c(n-1),standardize=standardize)$lambda
     regs$glmnet[1]=((regs$glmnet[1]-regs$glmnet[2])*1.5)+regs$glmnet[1]
   }
   return(regs)
@@ -36,8 +36,8 @@ citrus.buildModel.survival = function(features,labels,type,regularizationThresho
     standardize=addtlArgs[["standardize"]]
   }
   if (type=="glmnet") {
-    s = Surv(time=labels[,"time"],event=labels[,"event"])
-    model = glmnet(x=features,y=s,family="cox",lambda=regularizationThresholds,maxit=200000,alpha=alpha,standardize=standardize)
+    s = survival::Surv(time=labels[,"time"],event=labels[,"event"])
+    model = glmnet::glmnet(x=features,y=s,family="cox",lambda=regularizationThresholds,maxit=200000,alpha=alpha,standardize=standardize)
   } else {
     stop(paste("Type:",type,"not yet implemented"));
   }
@@ -46,8 +46,8 @@ citrus.buildModel.survival = function(features,labels,type,regularizationThresho
 
 citrus.cvIteration.survival = function(i,modelType,features,labels,regularizationThresholds,nFolds,alpha,standardize){
   if (modelType=="glmnet"){
-    s = Surv(time=labels[,"time"],event=labels[,"event"])
-    return(cv.glmnet(x=features,y=s,family="cox",lambda=regularizationThresholds,nfolds=nFolds,alpha=alpha,standardize=standardize)$cvm)
+    s = survival::Surv(time=labels[,"time"],event=labels[,"event"])
+    return(glmnet::cv.glmnet(x=features,y=s,family="cox",lambda=regularizationThresholds,nfolds=nFolds,alpha=alpha,standardize=standardize)$cvm)
   } else {
     stop(paste("Model Type",modelType,"unknown."));
   }
@@ -55,7 +55,7 @@ citrus.cvIteration.survival = function(i,modelType,features,labels,regularizatio
 
 citrus.thresholdCVs.survival = function(foldModels,foldFeatures,leftoutFeatures,modelTypes,regularizationThresholds,labels,folds,...){
   
-  s = Surv(time=labels[,"time"],event=labels[,"event"])
+  s = survival::Surv(time=labels[,"time"],event=labels[,"event"])
   
   thresholdPartialLikelihoods = lapply(modelTypes,citrus.calculateModelPartialLikelihood,leftoutFeatures=leftoutFeatures,foldFeatures=foldFeatures,foldModels=foldModels,labels=s,folds=folds,regularizationThresholds=regularizationThresholds)
   names(thresholdPartialLikelihoods)=modelTypes

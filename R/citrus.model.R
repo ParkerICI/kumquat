@@ -314,7 +314,7 @@ citrus.extractModelFeatures = function(cvMinima,finalModel,finalFeatures){
     thresholdIndex = cvMinima[[paste(cvPoint,"index",sep=".")]]
     if (modelType=="pamr"){
       if (finalModel$nonzero[thresholdIndex]>0){
-        f = pamr.listgenes(fit=finalModel,data=list(x=t(finalFeatures),geneids=colnames(finalFeatures)),threshold=threshold)  
+        f = pamr::pamr.listgenes(fit=finalModel,data=list(x=t(finalFeatures),geneids=colnames(finalFeatures)),threshold=threshold)  
         f = as.vector(f[,1])
         res[[cvPoint]][["features"]] = f
         res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  

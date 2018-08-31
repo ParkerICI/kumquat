@@ -5,7 +5,7 @@
 #' @param features A numeric matrix of predictive features. Rows are observations and column entries are features. 
 #' @param labels A vector of endpoint values (i.e. class labels) for each row of the feature matrix. 
 #' @param family Family of endpoint model to be constructed. Valid values are \code{classification} and \code{continuous}. 
-#' @param type Statistical model to be used. For \code{family="classification"}, options are \code{pamr} (Nearest Shrunken Centroid), \code{glmnet} (Lasso-regularized logistic regression), and \code{sam} (Non-parametric test in differences of means). For \code{family="continuous"}, options are \code{glmnet} (L1-regularized linear regression), and \code{sam}. 
+#' @param type Statistical model to be used. For \code{family='classification'}, options are \code{pamr} (Nearest Shrunken Centroid), \code{glmnet} (Lasso-regularized logistic regression), and \code{sam} (Non-parametric test in differences of means). For \code{family='continuous'}, options are \code{glmnet} (L1-regularized linear regression), and \code{sam}. 
 #' @param regularizationThresholds Vector of regularization values for penalized model construction. If \code{NULL}, values are automatically generated. Not valid for \code{sam} models.
 #' @param ... Other parameters passed to model-fitting procedures. 
 #' 
@@ -17,22 +17,25 @@
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.buildEndpointModel = function(features,labels,family="classification",type="pamr",regularizationThresholds=NULL,...){
-  if (is.null(regularizationThresholds)){
-    regularizationThresholds = citrus.generateRegularizationThresholds(features=features,labels=labels,modelType=type,family=family,...)
-  }
-  model = do.call(paste("citrus.buildModel",family,sep="."),args=list(features=features,labels=labels,type=type,regularizationThresholds=regularizationThresholds,...=...))
-  result = list(model=model,regularizationThresholds=regularizationThresholds,family=family,type=type)
-  class(result) = "citrus.endpointModel"
-  return(result)  
+citrus.buildEndpointModel <- function(features, labels, family = "classification", type = "pamr", regularizationThresholds = NULL, 
+    ...) {
+    if (is.null(regularizationThresholds)) {
+        regularizationThresholds <- citrus.generateRegularizationThresholds(features = features, labels = labels, 
+            modelType = type, family = family, ...)
+    }
+    model <- do.call(paste("citrus.buildModel", family, sep = "."), args = list(features = features, labels = labels, 
+        type = type, regularizationThresholds = regularizationThresholds, ... = ...))
+    result <- list(model = model, regularizationThresholds = regularizationThresholds, family = family, type = type)
+    class(result) <- "citrus.endpointModel"
+    return(result)
 }
 
 #' @export
 #' @name citrus.buildEndpointModel
-print.citrus.endpointModel = function(citrus.endpointModel,...){
-  cat("Citrus Model\n")
-  cat(paste("\tFamily:",citrus.endpointModel$family,"\n"))
-  cat(paste("\tType:",citrus.endpointModel$type,"\n"))
+print.citrus.endpointModel <- function(citrus.endpointModel, ...) {
+    cat("Citrus Model\n")
+    cat(paste("\tFamily:", citrus.endpointModel$family, "\n"))
+    cat(paste("\tType:", citrus.endpointModel$type, "\n"))
 }
 
 #' Generate model regularization thresholds 
@@ -49,8 +52,9 @@ print.citrus.endpointModel = function(citrus.endpointModel,...){
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.generateRegularizationThresholds = function(features,labels,modelType,family,n=100,...){
-  do.call(paste0("citrus.generateRegularizationThresholds.",family),args=list(features=features,labels=labels,modelType=modelType,n=n,...=...))
+citrus.generateRegularizationThresholds <- function(features, labels, modelType, family, n = 100, ...) {
+    do.call(paste0("citrus.generateRegularizationThresholds.", family), args = list(features = features, labels = labels, 
+        modelType = modelType, n = n, ... = ...))
 }
 
 #' Calculate model error rates 
@@ -78,30 +82,35 @@ citrus.generateRegularizationThresholds = function(features,labels,modelType,fam
 #' 
 #' @author Robert Bruggner
 #' @export 
-citrus.thresholdCVs = function(modelType,foldFeatures,labels,regularizationThresholds,family,folds,foldModels,leftoutFeatures,...){
-  if (modelType=="sam"){
-    return(NULL)
-  }
-  #do.call(paste0("citrus.thresholdCVs.",family),args=list(modelType=modelType,foldFeatures=foldFeatures,labels=labels,regularizationThresholds=regularizationThresholds,folds=folds,foldModels=foldModels,leftoutFeatures=leftoutFeatures,...=...))
-  leftoutPredictions = lapply(1:length(leftoutFeatures),paste0("foldPredict.",family),models=foldModels,features=leftoutFeatures)
-  predictionScore = lapply(1:length(leftoutPredictions),paste0("foldScore.",family),folds=folds,predictions=leftoutPredictions,labels=labels)
-  thresholdErrorRates = calculatePredictionErrorRate(predictionScore,regularizationThresholds,family)
-  thresholdFDRRates = .calculateTypeFDRRate(foldModels=foldModels,foldFeatures=foldFeatures,labels=labels,modelType=modelType)  
-  results = data.frame(threshold=regularizationThresholds,cvm=thresholdErrorRates$cvm,cvsd=thresholdErrorRates$cvsd);
-  if (!is.null(thresholdFDRRates)){
-    results$fdr = thresholdFDRRates
-  }
-  return(results)
+citrus.thresholdCVs <- function(modelType, foldFeatures, labels, regularizationThresholds, family, folds, foldModels, 
+    leftoutFeatures, ...) {
+    if (modelType == "sam") {
+        return(NULL)
+    }
+    # do.call(paste0('citrus.thresholdCVs.',family),args=list(modelType=modelType,foldFeatures=foldFeatures,labels=labels,regularizationThresholds=regularizationThresholds,folds=folds,foldModels=foldModels,leftoutFeatures=leftoutFeatures,...=...))
+    leftoutPredictions <- lapply(1:length(leftoutFeatures), paste0("foldPredict.", family), models = foldModels, features = leftoutFeatures)
+    predictionScore <- lapply(1:length(leftoutPredictions), paste0("foldScore.", family), folds = folds, predictions = leftoutPredictions, 
+        labels = labels)
+    thresholdErrorRates <- calculatePredictionErrorRate(predictionScore, regularizationThresholds, family)
+    thresholdFDRRates <- .calculateTypeFDRRate(foldModels = foldModels, foldFeatures = foldFeatures, labels = labels, 
+        modelType = modelType)
+    results <- data.frame(threshold = regularizationThresholds, cvm = thresholdErrorRates$cvm, cvsd = thresholdErrorRates$cvsd)
+    if (!is.null(thresholdFDRRates)) {
+        results$fdr <- thresholdFDRRates
+    }
+    return(results)
 }
 
 
 #' @rdname citrus.thresholdCVs
 #' @export 
-citrus.thresholdCVs.quick = function(modelType,features,labels,regularizationThresholds,family,nCVFolds=10,...){
-  if (modelType=="sam"){
-    return(NULL)
-  }
-  do.call(paste0("citrus.thresholdCVs.quick.",family),args=list(modelType=modelType,features=features,labels=labels,regularizationThresholds=regularizationThresholds,nCVFolds=nCVFolds,...=...))  
+citrus.thresholdCVs.quick <- function(modelType, features, labels, regularizationThresholds, family, nCVFolds = 10, 
+    ...) {
+    if (modelType == "sam") {
+        return(NULL)
+    }
+    do.call(paste0("citrus.thresholdCVs.quick.", family), args = list(modelType = modelType, features = features, 
+        labels = labels, regularizationThresholds = regularizationThresholds, nCVFolds = nCVFolds, ... = ...))
 }
 
 #' Predict labels of new feature set
@@ -114,10 +123,11 @@ citrus.thresholdCVs.quick = function(modelType,features,labels,regularizationThr
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.predict = function(citrus.endpointModel,newFeatures){
-  do.call(paste0("citrus.predict.",citrus.endpointModel$family),args=list(citrus.endpointModel=citrus.endpointModel,newFeatures=newFeatures))
+citrus.predict <- function(citrus.endpointModel, newFeatures) {
+    do.call(paste0("citrus.predict.", citrus.endpointModel$family), args = list(citrus.endpointModel = citrus.endpointModel, 
+        newFeatures = newFeatures))
 }
-  
+
 #' Build models from each fold of clustering
 #' 
 #' Builds a model from features derived from each independent fold of clustering.
@@ -133,29 +143,27 @@ citrus.predict = function(citrus.endpointModel,newFeatures){
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.buildFoldsEndpointModels = function(type,citrus.foldFeatureSet,labels,regularizationThresholds=NULL,family="classification",...){
-  
-  if (is.null(regularizationThresholds)){
-    regularizationThresholds = citrus.generateRegularizationThresholds(features=citrus.foldFeatureSet$allFeatures,labels=labels,modelType=type,family=family,...)
-  }
+citrus.buildFoldsEndpointModels <- function(type, citrus.foldFeatureSet, labels, regularizationThresholds = NULL, 
+    family = "classification", ...) {
     
-  # Build models
-  foldModels = lapply(1:citrus.foldFeatureSet$nFolds,
-         citrus.buildFoldEndpointModel,
-         folds=citrus.foldFeatureSet$folds,
-         foldFeatures=citrus.foldFeatureSet$foldFeatures,
-         labels=labels,
-         family=family,
-         type=type,
-         regularizationThreshold=regularizationThresholds)
-         
-  class(foldModels) = "citrus.foldModels"
-  return(foldModels)
+    if (is.null(regularizationThresholds)) {
+        regularizationThresholds <- citrus.generateRegularizationThresholds(features = citrus.foldFeatureSet$allFeatures, 
+            labels = labels, modelType = type, family = family, ...)
+    }
+    
+    # Build models
+    foldModels <- lapply(1:citrus.foldFeatureSet$nFolds, citrus.buildFoldEndpointModel, folds = citrus.foldFeatureSet$folds, 
+        foldFeatures = citrus.foldFeatureSet$foldFeatures, labels = labels, family = family, type = type, regularizationThreshold = regularizationThresholds)
+    
+    class(foldModels) <- "citrus.foldModels"
+    return(foldModels)
 }
 
-citrus.buildFoldEndpointModel = function(foldIndex,folds,foldFeatures,labels,family,type,regularizationThreshold,...){
-  foldLabels = labels[-folds[[foldIndex]]]
-  citrus.buildEndpointModel(foldFeatures[[foldIndex]],labels=foldLabels,family=family,type=type,regularizationThreshold=regularizationThreshold,...)
+citrus.buildFoldEndpointModel <- function(foldIndex, folds, foldFeatures, labels, family, type, regularizationThreshold, 
+    ...) {
+    foldLabels <- labels[-folds[[foldIndex]]]
+    citrus.buildEndpointModel(foldFeatures[[foldIndex]], labels = foldLabels, family = family, type = type, regularizationThreshold = regularizationThreshold, 
+        ...)
 }
 
 
@@ -191,60 +199,58 @@ citrus.buildFoldEndpointModel = function(foldIndex,folds,foldFeatures,labels,fam
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.endpointRegress = function(modelType,citrus.foldFeatureSet,labels,family,...){
+citrus.endpointRegress <- function(modelType, citrus.foldFeatureSet, labels, family, ...) {
     
-  if (nrow(citrus.foldFeatureSet$allFeatures)!=length(labels)){
-    stop(paste0("Number of features (",nrow(citrus.foldFeatureSet$allFeatures),") different from length of labels (",length(labels),")."))
-  }
+    if (nrow(citrus.foldFeatureSet$allFeatures) != length(labels)) {
+        stop(paste0("Number of features (", nrow(citrus.foldFeatureSet$allFeatures), ") different from length of labels (", 
+            length(labels), ")."))
+    }
     
-  # Build results 
-  result = list()
-  
-  # Reg Thresholds
-  result$regularizationThresholds = citrus.generateRegularizationThresholds(features=citrus.foldFeatureSet$allFeatures,labels=labels,modelType=modelType,family=family,...)
-  
-  # Fold Models
-  if ((citrus.foldFeatureSet$nFolds>1)&&(modelType!="sam")){
-    #foldModels = citrus.buildFoldsEndpointModels(type=modelType,citrus.foldFeatureSet=citrus.foldFeatureSet,labels=labels,regularizationThresholds=regularizationThresholds,family=family)
-    result$foldModels = citrus.buildFoldsEndpointModels(type=modelType,citrus.foldFeatureSet=citrus.foldFeatureSet,labels=labels,regularizationThresholds=result$regularizationThresholds,family=family,...)
-  } 
-  
-  # Final Models
-  #result$finalModel = citrus.buildEndpointModel(features=citrus.foldFeatureSet$allFeatures,labels=labels,family=family,type=modelType,regularizationThresholds=result$regularizationThresholds)
-  result$finalModel = citrus.buildEndpointModel(features=citrus.foldFeatureSet$allFeatures,labels=labels,family=family,type=modelType,regularizationThresholds=result$regularizationThresholds,...)
-  
-  # Calculate CV error rates
-  if (citrus.foldFeatureSet$nFolds>1){
-    result$thresholdCVRates = citrus.thresholdCVs(modelType=modelType,
-                                                  foldFeatures=citrus.foldFeatureSet$foldFeatures,
-                                                  labels=labels,
-                                                  regularizationThresholds=result$regularizationThresholds,
-                                                  family=family,
-                                                  folds=citrus.foldFeatureSet$folds,
-                                                  foldModels=result$foldModels,
-                                                  leftoutFeatures=citrus.foldFeatureSet$leftoutFeatures)
-  } else {
-    result$thresholdCVRates = citrus.thresholdCVs.quick(modelType=modelType,
-                                                        features=citrus.foldFeatureSet$allFeatures,
-                                                        labels=labels,
-                                                        regularizationThresholds=result$regularizationThresholds,
-                                                        family=family) 
-  }
-  
-  
-  # Find CV Minima
-  result$cvMinima = citrus.getCVMinima(modelType,thresholdCVRates=result$thresholdCVRates)
-  
-  # Extract differential features
-  result$differentialFeatures = citrus.extractModelFeatures(cvMinima=result$cvMinima,finalModel=result$finalModel,finalFeatures=citrus.foldFeatureSet$allFeatures)
-  
-  # Extra info
-  result$modelType=modelType
-  result$family=family
-  result$labels=labels
-  
-  class(result) = "citrus.regressionResult"
-  return(result)
+    # Build results
+    result <- list()
+    
+    # Reg Thresholds
+    result$regularizationThresholds <- citrus.generateRegularizationThresholds(features = citrus.foldFeatureSet$allFeatures, 
+        labels = labels, modelType = modelType, family = family, ...)
+    
+    # Fold Models
+    if ((citrus.foldFeatureSet$nFolds > 1) && (modelType != "sam")) {
+        # foldModels =
+        # citrus.buildFoldsEndpointModels(type=modelType,citrus.foldFeatureSet=citrus.foldFeatureSet,labels=labels,regularizationThresholds=regularizationThresholds,family=family)
+        result$foldModels <- citrus.buildFoldsEndpointModels(type = modelType, citrus.foldFeatureSet = citrus.foldFeatureSet, 
+            labels = labels, regularizationThresholds = result$regularizationThresholds, family = family, ...)
+    }
+    
+    # Final Models result$finalModel =
+    # citrus.buildEndpointModel(features=citrus.foldFeatureSet$allFeatures,labels=labels,family=family,type=modelType,regularizationThresholds=result$regularizationThresholds)
+    result$finalModel <- citrus.buildEndpointModel(features = citrus.foldFeatureSet$allFeatures, labels = labels, 
+        family = family, type = modelType, regularizationThresholds = result$regularizationThresholds, ...)
+    
+    # Calculate CV error rates
+    if (citrus.foldFeatureSet$nFolds > 1) {
+        result$thresholdCVRates <- citrus.thresholdCVs(modelType = modelType, foldFeatures = citrus.foldFeatureSet$foldFeatures, 
+            labels = labels, regularizationThresholds = result$regularizationThresholds, family = family, folds = citrus.foldFeatureSet$folds, 
+            foldModels = result$foldModels, leftoutFeatures = citrus.foldFeatureSet$leftoutFeatures)
+    } else {
+        result$thresholdCVRates <- citrus.thresholdCVs.quick(modelType = modelType, features = citrus.foldFeatureSet$allFeatures, 
+            labels = labels, regularizationThresholds = result$regularizationThresholds, family = family)
+    }
+    
+    
+    # Find CV Minima
+    result$cvMinima <- citrus.getCVMinima(modelType, thresholdCVRates = result$thresholdCVRates)
+    
+    # Extract differential features
+    result$differentialFeatures <- citrus.extractModelFeatures(cvMinima = result$cvMinima, finalModel = result$finalModel, 
+        finalFeatures = citrus.foldFeatureSet$allFeatures)
+    
+    # Extra info
+    result$modelType <- modelType
+    result$family <- family
+    result$labels <- labels
+    
+    class(result) <- "citrus.regressionResult"
+    return(result)
 }
 
 
@@ -265,31 +271,32 @@ citrus.endpointRegress = function(modelType,citrus.foldFeatureSet,labels,family,
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.getCVMinima = function(modelType,thresholdCVRates,fdrRate=0.01){
-  cvPoints=list();
-  if (modelType=="sam"){
-    cvPoints[["fdr_0.10"]]=10
-    cvPoints[["fdr_0.05"]]=5
-    cvPoints[["fdr_0.01"]]=1
-  } else {
-    errorRates = thresholdCVRates$cvm
-    SEMs = thresholdCVRates$cvsd
-    FDRRates = thresholdCVRates$fdr
-    cvPoints[["cv.min.index"]] = min(which(errorRates==min(errorRates,na.rm=T)))
-    cvPoints[["cv.min"]] = thresholdCVRates$threshold[cvPoints[["cv.min.index"]]]
-    cvPoints[["cv.1se.index"]] = min(which(errorRates<=(errorRates[cvPoints[["cv.min.index"]]]+SEMs[cvPoints[["cv.min.index"]]])))
-    cvPoints[["cv.1se"]] = thresholdCVRates$threshold[cvPoints[["cv.1se.index"]]]
-    if (!is.null(FDRRates)) {
-      if (any(FDRRates<fdrRate)){
-        if (length(intersect(which(FDRRates<0.01),which(errorRates==min(errorRates,na.rm=T))))>0){
-          cvPoints[["cv.fdr.constrained.index"]] = max(intersect(which(FDRRates<0.01),which(errorRates==min(errorRates,na.rm=T))))
-          cvPoints[["cv.fdr.constrained"]] = thresholdCVRates$threshold[cvPoints[["cv.fdr.constrained.index"]]]
+citrus.getCVMinima <- function(modelType, thresholdCVRates, fdrRate = 0.01) {
+    cvPoints <- list()
+    if (modelType == "sam") {
+        cvPoints[["fdr_0.10"]] <- 10
+        cvPoints[["fdr_0.05"]] <- 5
+        cvPoints[["fdr_0.01"]] <- 1
+    } else {
+        errorRates <- thresholdCVRates$cvm
+        SEMs <- thresholdCVRates$cvsd
+        FDRRates <- thresholdCVRates$fdr
+        cvPoints[["cv.min.index"]] <- min(which(errorRates == min(errorRates, na.rm = T)))
+        cvPoints[["cv.min"]] <- thresholdCVRates$threshold[cvPoints[["cv.min.index"]]]
+        cvPoints[["cv.1se.index"]] <- min(which(errorRates <= (errorRates[cvPoints[["cv.min.index"]]] + SEMs[cvPoints[["cv.min.index"]]])))
+        cvPoints[["cv.1se"]] <- thresholdCVRates$threshold[cvPoints[["cv.1se.index"]]]
+        if (!is.null(FDRRates)) {
+            if (any(FDRRates < fdrRate)) {
+                if (length(intersect(which(FDRRates < 0.01), which(errorRates == min(errorRates, na.rm = T)))) > 0) {
+                  cvPoints[["cv.fdr.constrained.index"]] <- max(intersect(which(FDRRates < 0.01), which(errorRates == 
+                    min(errorRates, na.rm = T))))
+                  cvPoints[["cv.fdr.constrained"]] <- thresholdCVRates$threshold[cvPoints[["cv.fdr.constrained.index"]]]
+                }
+            }
+            
         }
-      }
-      
     }
-  }
-  return(cvPoints)
+    return(cvPoints)
 }
 
 #' Report model features at pre-specified thresholds.
@@ -305,69 +312,73 @@ citrus.getCVMinima = function(modelType,thresholdCVRates,fdrRate=0.01){
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.extractModelFeatures = function(cvMinima,finalModel,finalFeatures){
-  res = list();
-  modelType = finalModel$type
-  finalModel = finalModel$model
-  for (cvPoint in names(cvMinima)[!grepl("index",names(cvMinima))]){
-    threshold = cvMinima[[cvPoint]]
-    thresholdIndex = cvMinima[[paste(cvPoint,"index",sep=".")]]
-    if (modelType=="pamr"){
-      if (finalModel$nonzero[thresholdIndex]>0){
-        f = pamr::pamr.listgenes(fit=finalModel,data=list(x=t(finalFeatures),geneids=colnames(finalFeatures)),threshold=threshold)  
-        f = as.vector(f[,1])
-        res[[cvPoint]][["features"]] = f
-        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  
-      } else {
-        res[[cvPoint]][["features"]] = NULL
-        res[[cvPoint]][["clusters"]] = NULL
-      }
-      
-    } else if (modelType=="glmnet"){
-      # THIS NEEDS TO BE FIXED IN ORDER TO SUPPORT MULTINOMIAL REGRESSION WITH GLMNET
-      f = as.matrix(predict(finalModel,newx=finalFeatures,type="coefficient",s=threshold))
-      f = rownames(f)[f!=0]
-      if ("(Intercept)" %in% f){
-        f = f[-(which(f=="(Intercept)"))]
-      }
-      if (length(f)>0){
-        res[[cvPoint]][["features"]] = f
-        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  
-      } else {
-        res[[cvPoint]][["features"]] = NULL;
-        res[[cvPoint]][["clusters"]] = NULL;
-      }
-    } else if (modelType=="sam"){
-      sigGenes = rbind(finalModel$siggenes.table$genes.up,finalModel$siggenes.table$genes.lo)
-      sigGenes = sigGenes[as.numeric(sigGenes[,"q-value(%)"])<threshold,,drop=F]
-      f = sigGenes[,"Gene ID"]
-      if (length(f)>0){
-        #sigGenes = sigGenes[order(abs(as.numeric(sigGenes[,"Fold Change"]))),,drop=F]
-        res[[cvPoint]][["features"]] = f
-        res[[cvPoint]][["clusters"]] = sort(unique(as.numeric(do.call("rbind",strsplit(f,split="_"))[,2])))  
-      } else {
-        res[[cvPoint]][["features"]] = NULL;
-        res[[cvPoint]][["clusters"]] = NULL;
-      }
+citrus.extractModelFeatures <- function(cvMinima, finalModel, finalFeatures) {
+    res <- list()
+    modelType <- finalModel$type
+    finalModel <- finalModel$model
+    for (cvPoint in names(cvMinima)[!grepl("index", names(cvMinima))]) {
+        threshold <- cvMinima[[cvPoint]]
+        thresholdIndex <- cvMinima[[paste(cvPoint, "index", sep = ".")]]
+        if (modelType == "pamr") {
+            if (finalModel$nonzero[thresholdIndex] > 0) {
+                f <- pamr::pamr.listgenes(fit = finalModel, data = list(x = t(finalFeatures), geneids = colnames(finalFeatures)), 
+                  threshold = threshold)
+                f <- as.vector(f[, 1])
+                res[[cvPoint]][["features"]] <- f
+                res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", strsplit(f, split = "_"))[, 
+                  2])))
+            } else {
+                res[[cvPoint]][["features"]] <- NULL
+                res[[cvPoint]][["clusters"]] <- NULL
+            }
+            
+        } else if (modelType == "glmnet") {
+            # THIS NEEDS TO BE FIXED IN ORDER TO SUPPORT MULTINOMIAL REGRESSION WITH GLMNET
+            f <- as.matrix(predict(finalModel, newx = finalFeatures, type = "coefficient", s = threshold))
+            f <- rownames(f)[f != 0]
+            if ("(Intercept)" %in% f) {
+                f <- f[-(which(f == "(Intercept)"))]
+            }
+            if (length(f) > 0) {
+                res[[cvPoint]][["features"]] <- f
+                res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", strsplit(f, split = "_"))[, 
+                  2])))
+            } else {
+                res[[cvPoint]][["features"]] <- NULL
+                res[[cvPoint]][["clusters"]] <- NULL
+            }
+        } else if (modelType == "sam") {
+            sigGenes <- rbind(finalModel$siggenes.table$genes.up, finalModel$siggenes.table$genes.lo)
+            sigGenes <- sigGenes[as.numeric(sigGenes[, "q-value(%)"]) < threshold, , drop = F]
+            f <- sigGenes[, "Gene ID"]
+            if (length(f) > 0) {
+                # sigGenes = sigGenes[order(abs(as.numeric(sigGenes[,'Fold Change']))),,drop=F]
+                res[[cvPoint]][["features"]] <- f
+                res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", strsplit(f, split = "_"))[, 
+                  2])))
+            } else {
+                res[[cvPoint]][["features"]] <- NULL
+                res[[cvPoint]][["clusters"]] <- NULL
+            }
+        }
     }
-  }
-  return(res)
+    return(res)
 }
 
-calculatePredictionErrorRate = function(predictionScore,regularizationThresholds,family){
-  nFolds=length(predictionScore)
-  counter=1;
-  tmp=list()
-  for (i in 1:nFolds){
-    for (j in 1:nrow(predictionScore[[i]])){
-      tmp[[counter]] = predictionScore[[i]][j,]
-      length(tmp[[counter]])=length(regularizationThresholds)
-      counter=counter+1;
+calculatePredictionErrorRate <- function(predictionScore, regularizationThresholds, family) {
+    nFolds <- length(predictionScore)
+    counter <- 1
+    tmp <- list()
+    for (i in 1:nFolds) {
+        for (j in 1:nrow(predictionScore[[i]])) {
+            tmp[[counter]] <- predictionScore[[i]][j, ]
+            length(tmp[[counter]]) <- length(regularizationThresholds)
+            counter <- counter + 1
+        }
     }
-  }
-  bound = do.call("rbind",tmp)
-  thresholdMeans = apply(bound,2,mean,na.rm=T)
-  
-  thresholdSEMs = apply(bound,2,sd,na.rm=T)/sqrt(apply(!is.na(bound),2,sum))
-  return(list(cvm=thresholdMeans,cvsd=thresholdSEMs))
-} 
+    bound <- do.call("rbind", tmp)
+    thresholdMeans <- apply(bound, 2, mean, na.rm = T)
+    
+    thresholdSEMs <- apply(bound, 2, sd, na.rm = T)/sqrt(apply(!is.na(bound), 2, sum))
+    return(list(cvm = thresholdMeans, cvsd = thresholdSEMs))
+}

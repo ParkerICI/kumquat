@@ -27,7 +27,7 @@ citrus.buildEndpointModel(features, labels, family = "classification",
 
 \item{labels}{A vector of endpoint values (i.e. class labels) for each row of the feature matrix.}
 
-\item{type}{Statistical model to be used. For \code{family="classification"}, options are \code{pamr} (Nearest Shrunken Centroid), \code{glmnet} (Lasso-regularized logistic regression), and \code{sam} (Non-parametric test in differences of means). For \code{family="continuous"}, options are \code{glmnet} (L1-regularized linear regression), and \code{sam}.}
+\item{type}{Statistical model to be used. For \code{family='classification'}, options are \code{pamr} (Nearest Shrunken Centroid), \code{glmnet} (Lasso-regularized logistic regression), and \code{sam} (Non-parametric test in differences of means). For \code{family='continuous'}, options are \code{glmnet} (L1-regularized linear regression), and \code{sam}.}
 
 \item{regularizationThresholds}{Vector of regularization values for penalized model construction. If \code{NULL}, values are automatically generated. Not valid for \code{sam} models.}
 

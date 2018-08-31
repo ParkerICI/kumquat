@@ -1,3 +1,7 @@
+** This repo is a work in progress. The only reason why it is public is because of the way forks work in github. Please do not use any of this code yet **
+
+
+
 ==Citrus Readme==
 Citrus is a package for identifying clusters of cells in multidimensional flow cytometry data associated with an experimental or clincal endpoint of interest.
 

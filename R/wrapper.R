@@ -21,11 +21,11 @@ run_citrus_analysis <- function(citrus.features, endpoint, working.directory, mo
         
     } else family <- "continuous"
     
-    citrus.res <- citrus::citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, labels = endpoint, 
-        family = family)
+    citrus.res <- citrus::citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
+        labels = endpoint, family = family)
     
-    plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, citrus.combinedFCSSet = NULL, 
-        "stratifyingFeatures")
+    plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, 
+        citrus.combinedFCSSet = NULL, "stratifyingFeatures")
     return(citrus.res)
     
 }

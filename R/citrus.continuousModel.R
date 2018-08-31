@@ -1,7 +1,8 @@
 #' @rdname citrus.buildEndpointModel
 #' @name citrus.buildEndpointModel
 #' @export
-citrus.buildModel.continuous <- function(features, labels, type, regularizationThresholds, ...) {
+citrus.buildModel.continuous <- function(features, labels, type, regularizationThresholds, 
+    ...) {
     
     addtlArgs <- list(...)
     alpha <- 1
@@ -24,8 +25,8 @@ citrus.buildModel.continuous <- function(features, labels, type, regularizationT
             alpha = alpha, standardize = standardize)
     } else if (type == "sam") {
         noVarianceFeatures <- apply(features, 2, var) == 0
-        model <- samr::SAM(x = t(features[, !noVarianceFeatures]), y = labels, resp.type = "Quantitative", genenames = colnames(features[, 
-            !noVarianceFeatures]), nperms = 10000)
+        model <- samr::SAM(x = t(features[, !noVarianceFeatures]), y = labels, resp.type = "Quantitative", 
+            genenames = colnames(features[, !noVarianceFeatures]), nperms = 10000)
     } else {
         stop(paste("Type:", type, "not implemented for continuous model"))
     }
@@ -35,8 +36,8 @@ citrus.buildModel.continuous <- function(features, labels, type, regularizationT
 #' @rdname citrus.thresholdCVs
 #' @name citrus.thresholdCVs
 #' @export
-citrus.thresholdCVs.quick.continuous <- function(modelType, features, labels, regularizationThresholds, nCVFolds = 10, 
-    ...) {
+citrus.thresholdCVs.quick.continuous <- function(modelType, features, labels, regularizationThresholds, 
+    nCVFolds = 10, ...) {
     
     errorRates <- list()
     errorRates$threshold <- regularizationThresholds
@@ -51,8 +52,9 @@ citrus.thresholdCVs.quick.continuous <- function(modelType, features, labels, re
         if ("standardize" %in% names(addtlArgs)) {
             standardize <- addtlArgs[["standardize"]]
         }
-        glmnetModel <- glmnet::cv.glmnet(x = features, y = labels, family = "gaussian", lambda = regularizationThresholds, 
-            type.measure = "mse", alpha = alpha, standardize = standardize)
+        glmnetModel <- glmnet::cv.glmnet(x = features, y = labels, family = "gaussian", 
+            lambda = regularizationThresholds, type.measure = "mse", alpha = alpha, 
+            standardize = standardize)
         errorRates$cvm <- glmnetModel$cvm
         errorRates$cvsd <- glmnetModel$cvsd
     } else if (modelType == "sam") {
@@ -90,7 +92,8 @@ citrus.predict.continuous <- function(citrus.endpointModel, newFeatures) {
 #' @rdname citrus.generateRegularizationThresholds
 #' @name citrus.generateRegularizationThresholds
 #' @export
-citrus.generateRegularizationThresholds.continuous <- function(features, labels, modelType, n = 100, ...) {
+citrus.generateRegularizationThresholds.continuous <- function(features, labels, 
+    modelType, n = 100, ...) {
     addtlArgs <- list(...)
     alpha <- 1
     if ("alpha" %in% names(addtlArgs)) {
@@ -102,7 +105,8 @@ citrus.generateRegularizationThresholds.continuous <- function(features, labels,
     }
     
     if (modelType == "glmnet") {
-        return(glmnet::glmnet(x = features, y = labels, family = "gaussian", alpha = alpha, nlambda = n, standardize = standardize)$lambda)
+        return(glmnet::glmnet(x = features, y = labels, family = "gaussian", alpha = alpha, 
+            nlambda = n, standardize = standardize)$lambda)
     } else {
         return(NULL)
     }

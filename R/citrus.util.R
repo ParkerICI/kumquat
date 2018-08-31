@@ -11,8 +11,10 @@
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.selectClusters <- function(citrus.clustering, method = "minimumClusterSize", ...) {
-    do.call(paste0("citrus.selectClusters.", method), args = list(citrus.clustering = citrus.clustering, ...))
+citrus.selectClusters <- function(citrus.clustering, method = "minimumClusterSize", 
+    ...) {
+    do.call(paste0("citrus.selectClusters.", method), args = list(citrus.clustering = citrus.clustering, 
+        ...))
 }
 
 #' Selects clusters for endpoint analysis
@@ -28,7 +30,8 @@ citrus.selectClusters <- function(citrus.clustering, method = "minimumClusterSiz
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.selectClusters.minimumClusterSize <- function(citrus.clustering, minimumClusterSizePercent = 0.05, ...) {
+citrus.selectClusters.minimumClusterSize <- function(citrus.clustering, minimumClusterSizePercent = 0.05, 
+    ...) {
     clusterSizes <- sapply(citrus.clustering$clusterMembership, length)
     minimumClusterSize <- (length(citrus.clustering$clusterMembership) + 1) * minimumClusterSizePercent
     return(which(clusterSizes >= minimumClusterSize))
@@ -40,7 +43,8 @@ citrus.convertConditionMatrix <- function(conditionMatrix) {
     for (i in 1:nrow(conditionMatrix)) {
         for (j in 1:ncol(conditionMatrix)) {
             if (conditionMatrix[i, j]) {
-                conditions <- append(conditions, list(unique(c(rownames(conditionMatrix)[i], colnames(conditionMatrix)[j]))))
+                conditions <- append(conditions, list(unique(c(rownames(conditionMatrix)[i], 
+                  colnames(conditionMatrix)[j]))))
             }
         }
     }

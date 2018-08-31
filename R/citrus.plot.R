@@ -12,12 +12,13 @@
     
     # Get channel names colLabels = citrus.combinedFCSSet$fileChannelNames[[1]][[1]]
     
-    # Get reagent names reagentNames = citrus.combinedFCSSet$fileReagentNames[[1]][[1]]
+    # Get reagent names reagentNames =
+    # citrus.combinedFCSSet$fileReagentNames[[1]][[1]]
     
     # Set display names to channel names displayNames = colLabels
     
-    # update display names to equal reagent names where reagent names > 2 displayNames[nchar(reagentNames)>2] =
-    # reagentNames[nchar(reagentNames)>2]
+    # update display names to equal reagent names where reagent names > 2
+    # displayNames[nchar(reagentNames)>2] = reagentNames[nchar(reagentNames)>2]
     
     displayNames <- citrus.combinedFCSSet$fileReagentNames[[1]][[1]]
     
@@ -25,7 +26,8 @@
         # If clustering columns is numeric, pass back the indices
         return(displayNames[clusteringColumns])
     } else {
-        # Otherwise, set the names of display names to be the channel names names(displayNames) = colLabels
+        # Otherwise, set the names of display names to be the channel names
+        # names(displayNames) = colLabels
         names(displayNames) <- citrus.combinedFCSSet$fileChannelNames[[1]][[1]]
         # and return the display names from the corresponding clustering columns
         return(as.vector(displayNames[clusteringColumns]))
@@ -48,12 +50,14 @@
 }
 
 .getClusterFeatureMatrix <- function(featureVector) {
-    df <- do.call("rbind", strsplit(gsub(pattern = "(cluster [0-9]+) ", replacement = "\\1~", featureVector), "~"))
-    return(cbind(cluster = do.call("rbind", strsplit(df[, 1], " "))[, 2], feature = df[, 2]))
+    df <- do.call("rbind", strsplit(gsub(pattern = "(cluster [0-9]+) ", replacement = "\\1~", 
+        featureVector), "~"))
+    return(cbind(cluster = do.call("rbind", strsplit(df[, 1], " "))[, 2], feature = df[, 
+        2]))
 }
 
-citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regularizationThresholds, thresholdCVRates, 
-    finalModel, cvMinima, family) {
+citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regularizationThresholds, 
+    thresholdCVRates, finalModel, cvMinima, family) {
     if (modelType == "sam") {
         return()
     }
@@ -63,8 +67,8 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
     errorRates <- thresholdCVRates[, "cvm"]
     ylim <- c(0, 1)
     if (family == "continuous") {
-        ylim <- c(min(thresholdCVRates[, "cvm"] - thresholdCVRates[, "cvsd"]) * 0.9, max(thresholdCVRates[, "cvm"] + 
-            thresholdCVRates[, "cvsd"]) * 1.1)
+        ylim <- c(min(thresholdCVRates[, "cvm"] - thresholdCVRates[, "cvsd"]) * 0.9, 
+            max(thresholdCVRates[, "cvm"] + thresholdCVRates[, "cvsd"]) * 1.1)
     }
     ylab <- "Model Cross Validation Error Rate"
     if (modelType == "glmnet") {
@@ -79,12 +83,12 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
         xlab <- "Regularization Threshold"
         nonzeroCounts <- finalModel$nonzero
     }
-    plot(errorRates, type = "o", pch = 20, col = "red", main = "Number of model features\n", axes = F, xlab = xlab, 
-        ylim = ylim, ylab = ylab)
+    plot(errorRates, type = "o", pch = 20, col = "red", main = "Number of model features\n", 
+        axes = F, xlab = xlab, ylim = ylim, ylab = ylab)
     # Plot SEM
     for (i in 1:length(thresholds)) {
-        lines(c(i, i), c(errorRates[i] + thresholdCVRates[, "cvsd"][i], errorRates[i] - thresholdCVRates[, "cvsd"][i]), 
-            col = "red", lty = 3)
+        lines(c(i, i), c(errorRates[i] + thresholdCVRates[, "cvsd"][i], errorRates[i] - 
+            thresholdCVRates[, "cvsd"][i]), col = "red", lty = 3)
     }
     grid()
     axis(1, at = 1:length(errorRates), labels = sapply(thresholds, .formatDecimal))
@@ -112,10 +116,12 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
     cv.min <- cvMinima$cv.min.index
     cv.1se <- cvMinima$cv.1se.index
     if (!is.null(cv.min)) {
-        points(c(cv.min, cv.min), y = c(errorRates[cv.min], errorRates[cv.min]), col = "green", pch = 20, cex = 2)
+        points(c(cv.min, cv.min), y = c(errorRates[cv.min], errorRates[cv.min]), 
+            col = "green", pch = 20, cex = 2)
     }
     if (!is.null(cv.1se)) {
-        points(c(cv.1se, cv.1se), y = c(errorRates[cv.1se], errorRates[cv.1se]), col = "orange", pch = 9, cex = 2)
+        points(c(cv.1se, cv.1se), y = c(errorRates[cv.1se], errorRates[cv.1se]), 
+            col = "orange", pch = 9, cex = 2)
     }
     
     legendLabels <- c(legendLabels, "cv.min", "cv.1se")
@@ -127,10 +133,10 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
     if ("cv.fdr.constrained" %in% names(cvMinima)) {
         
         cv.fdr.constrained <- cvMinima$cv.fdr.constrained.index
-        points(c(cv.fdr.constrained, cv.fdr.constrained), y = c(errorRates[cv.fdr.constrained], errorRates[cv.fdr.constrained]), 
-            col = "yellow", pch = 17, cex = 1.5)
-        points(c(cv.fdr.constrained, cv.fdr.constrained), y = c(errorRates[cv.fdr.constrained], errorRates[cv.fdr.constrained]), 
-            col = "black", pch = 2, cex = 1.5)
+        points(c(cv.fdr.constrained, cv.fdr.constrained), y = c(errorRates[cv.fdr.constrained], 
+            errorRates[cv.fdr.constrained]), col = "yellow", pch = 17, cex = 1.5)
+        points(c(cv.fdr.constrained, cv.fdr.constrained), y = c(errorRates[cv.fdr.constrained], 
+            errorRates[cv.fdr.constrained]), col = "black", pch = 2, cex = 1.5)
         legendLabels <- c(legendLabels, "cv.fdr.constrained")
         legendColors <- c(legendColors, "yellow")
         legendPchs <- c(legendPchs, 17)
@@ -138,30 +144,32 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
         legendPtCex <- c(legendPtCex, 1.5)
         
     }
-    legend(x = "topleft", legendLabels, col = legendColors, pch = legendPchs, lty = legendLty, pt.cex = legendPtCex, 
-        cex = 0.8, bg = "white")
+    legend(x = "topleft", legendLabels, col = legendColors, pch = legendPchs, lty = legendLty, 
+        pt.cex = legendPtCex, cex = 0.8, bg = "white")
     dev.off()
 }
 
-citrus.plotModelDifferentialFeatures.classification <- function(differentialFeatures, features, modelOutputDirectory, 
-    labels, ...) {
+citrus.plotModelDifferentialFeatures.classification <- function(differentialFeatures, 
+    features, modelOutputDirectory, labels, ...) {
     for (cvPoint in names(differentialFeatures)) {
         nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
         
         # Write features to file for easy parsing
-        write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, paste("features_", cvPoint, 
-            ".csv", sep = "")), quote = F)
+        write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, 
+            paste("features_", cvPoint, ".csv", sep = "")), quote = F)
         
-        melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], labels = labels, check.names = F), 
-            id.vars = "labels")
+        melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
+            labels = labels, check.names = F), id.vars = "labels")
         
         
-        pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", replacement = "_", x = cvPoint), 
-            ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 1.5)
-        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = factor(labels), y = value)) + ggplot2::facet_wrap(~variable, 
-            ncol = 1) + ggplot2::geom_boxplot(outlier.colour = rgb(0, 0, 0, 0), colour = rgb(0, 0, 0, 0.3)) + ggplot2::geom_point(ggplot2::aes(color = factor(labels)), 
-            alpha = I(0.25), shape = 19, size = I(2)) + ggplot2::coord_flip() + ggplot2::theme_bw() + ggplot2::ylab("") + 
-            ggplot2::xlab("") + ggplot2::theme(legend.position = "none"))
+        pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", 
+            replacement = "_", x = cvPoint), ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 
+            1.5)
+        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = factor(labels), y = value)) + 
+            ggplot2::facet_wrap(~variable, ncol = 1) + ggplot2::geom_boxplot(outlier.colour = rgb(0, 
+            0, 0, 0), colour = rgb(0, 0, 0, 0.3)) + ggplot2::geom_point(ggplot2::aes(color = factor(labels)), 
+            alpha = I(0.25), shape = 19, size = I(2)) + ggplot2::coord_flip() + ggplot2::theme_bw() + 
+            ggplot2::ylab("") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none"))
         if (any(grepl(pattern = "abundance", nonzeroFeatureNames))) {
             p <- p + ggplot2::scale_y_log10() + ggplot2::ylab("Log10 scale")
         }
@@ -171,22 +179,24 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
     
 }
 
-citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures, features, modelOutputDirectory, 
-    labels, ...) {
+citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures, 
+    features, modelOutputDirectory, labels, ...) {
     for (cvPoint in names(differentialFeatures)) {
         nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
         
         # Write features to file for easy parsing
-        write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, paste("features_", cvPoint, 
-            ".csv", sep = "")), quote = F)
+        write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, 
+            paste("features_", cvPoint, ".csv", sep = "")), quote = F)
         
-        melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], labels = labels, check.names = F), 
-            id.vars = "labels")
+        melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
+            labels = labels, check.names = F), id.vars = "labels")
         
-        pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", replacement = "_", x = cvPoint), 
-            ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 1.5)
-        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = value, y = labels)) + ggplot2::facet_wrap(~variable, ncol = 1) + 
-            ggplot2::geom_point(size = I(2)) + ggplot2::theme_bw() + ggplot2::ylab("") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none"))
+        pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", 
+            replacement = "_", x = cvPoint), ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 
+            1.5)
+        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = value, y = labels)) + ggplot2::facet_wrap(~variable, 
+            ncol = 1) + ggplot2::geom_point(size = I(2)) + ggplot2::theme_bw() + 
+            ggplot2::ylab("") + ggplot2::xlab("") + ggplot2::theme(legend.position = "none"))
         if (any(grepl(pattern = "abundance", nonzeroFeatureNames))) {
             p <- p + ggplot2::scale_x_log10() + ggplot2::xlab("Log10 scale")
         }
@@ -199,25 +209,28 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
 citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
     combined <- data.frame(check.names = F, check.rows = F)
     for (clusterName in names(clusterDataList)) {
-        combined <- rbind(combined, cbind(melt(clusterDataList[[clusterName]], varnames = c("row", "marker")), clusterId = clusterName, 
-            src = "Cluster"))
+        combined <- rbind(combined, cbind(melt(clusterDataList[[clusterName]], varnames = c("row", 
+            "marker")), clusterId = clusterName, src = "Cluster"))
     }
-    p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., fill = src)) + ggplot2::geom_density() + 
-        ggplot2::facet_grid(clusterId ~ marker, scales = "free") + ggplot2::geom_density(data = cbind(reshape2::melt(backgroundData, 
-        varnames = c("row", "marker")), src = "Background")) + ggplot2::theme_bw() + ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 
-        0.3, 1, 0.2), Cluster = rgb(1, 0.3, 0.3, 0.5))) + ggplot2::theme(legend.position = "bottom", axis.text.y = element_blank(), 
-        axis.ticks.y = element_blank(), axis.title = element_blank()) + ggplot2::labs(fill = "Distribution:"))
+    p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., 
+        fill = src)) + ggplot2::geom_density() + ggplot2::facet_grid(clusterId ~ 
+        marker, scales = "free") + ggplot2::geom_density(data = cbind(reshape2::melt(backgroundData, 
+        varnames = c("row", "marker")), src = "Background")) + ggplot2::theme_bw() + 
+        ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), 
+            Cluster = rgb(1, 0.3, 0.3, 0.5))) + ggplot2::theme(legend.position = "bottom", 
+        axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.title = element_blank()) + 
+        ggplot2::labs(fill = "Distribution:"))
     print(p)
 }
 
-citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory, clusterAssignments, citrus.combinedFCSSet, 
-    clusteringColumns, ...) {
+citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory, 
+    clusterAssignments, citrus.combinedFCSSet, clusteringColumns, ...) {
     for (cvPoint in names(differentialFeatures)) {
         clusterIds <- as.numeric(differentialFeatures[[cvPoint]][["clusters"]])
-        outputFile <- file.path(modelOutputDirectory, paste("clusters-", sub(pattern = "\\.", replacement = "_", x = cvPoint), 
-            ".pdf", sep = ""))
-        citrus.plotClusters(clusterIds, clusterAssignments = clusterAssignments, citrus.combinedFCSSet, clusteringColumns, 
-            outputFile = outputFile, ...)
+        outputFile <- file.path(modelOutputDirectory, paste("clusters-", sub(pattern = "\\.", 
+            replacement = "_", x = cvPoint), ".pdf", sep = ""))
+        citrus.plotClusters(clusterIds, clusterAssignments = clusterAssignments, 
+            citrus.combinedFCSSet, clusteringColumns, outputFile = outputFile, ...)
     }
 }
 
@@ -235,24 +248,28 @@ citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory,
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.plotClusters <- function(clusterIds, clusterAssignments, citrus.combinedFCSSet, clusteringColumns, conditions = NULL, 
-    outputFile = NULL, ...) {
+citrus.plotClusters <- function(clusterIds, clusterAssignments, citrus.combinedFCSSet, 
+    clusteringColumns, conditions = NULL, outputFile = NULL, ...) {
     
     data <- citrus.combinedFCSSet$data
     
     if (!is.null(outputFile)) {
-        pdf(file = outputFile, width = (2.2 * length(clusteringColumns) + 2), height = (2 * length(clusterIds)))
+        pdf(file = outputFile, width = (2.2 * length(clusteringColumns) + 2), height = (2 * 
+            length(clusterIds)))
     }
     clusterDataList <- list()
     for (clusterId in sort(clusterIds)) {
         if (length(clusterAssignments[[clusterId]]) > 2500) {
-            clusterDataList[[as.character(clusterId)]] <- data[clusterAssignments[[clusterId]], clusteringColumns][sample(1:length(clusterAssignments[[clusterId]]), 
+            clusterDataList[[as.character(clusterId)]] <- data[clusterAssignments[[clusterId]], 
+                clusteringColumns][sample(1:length(clusterAssignments[[clusterId]]), 
                 2500), ]
         } else {
-            clusterDataList[[as.character(clusterId)]] <- data[clusterAssignments[[clusterId]], clusteringColumns]
+            clusterDataList[[as.character(clusterId)]] <- data[clusterAssignments[[clusterId]], 
+                clusteringColumns]
         }
         
-        colnames(clusterDataList[[as.character(clusterId)]]) <- .getDisplayNames(citrus.combinedFCSSet, clusteringColumns)
+        colnames(clusterDataList[[as.character(clusterId)]]) <- .getDisplayNames(citrus.combinedFCSSet, 
+            clusteringColumns)
         
     }
     if (nrow(data) > 2500) {
@@ -280,15 +297,12 @@ citrus.plotClusters <- function(clusterIds, clusterAssignments, citrus.combinedF
 #' @param citrus.foldFeatureSet A \code{citrus.foldFeatureSet} object. 
 #' @param citrus.combinedFCSSet A \code{citrus.combinedFCSSet} object.
 #' @param plotTypes Vector of plots types to make. Valid options are \code{errorRate} (Cross-validated error rates for predictive models),
-#' \code{stratifyingFeatures} (plots of non-zero model features),\code{stratifyingClusters} (plots of clustering marker distributions in stratifying clusters), and
-#' \code{clusterGraph} (Plots of clustering hierarchy graph).
-#' @param hierarchyGraph A hierarchy graph configuration created by \code{\link{citrus.createHierarchyGraph}}. If \code{NULL}, automatically generated.
-#' 
+#' \code{stratifyingFeatures} (plots of non-zero model features),\code{stratifyingClusters} (plots of clustering marker distributions in stratifying clusters)
 #' @author Robert Bruggner
 #' 
-plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirectory, citrus.foldClustering, citrus.foldFeatureSet, 
-    citrus.combinedFCSSet, plotTypes = c("errorRate", "stratifyingFeatures", "stratifyingClusters", "clusterGraph"), 
-    ...) {
+plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirectory, 
+    citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet, plotTypes = c("errorRate", 
+        "stratifyingFeatures", "stratifyingClusters"), ...) {
     addtlArgs <- list(...)
     
     theme <- "black"
@@ -306,22 +320,26 @@ plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirector
     
     if ("errorRate" %in% plotTypes) {
         cat("Plotting Error Rate\n")
-        citrus.plotTypeErrorRate(modelType = modelType, modelOutputDirectory = modelOutputDirectory, regularizationThresholds = citrus.regressionResult$regularizationThresholds, 
+        citrus.plotTypeErrorRate(modelType = modelType, modelOutputDirectory = modelOutputDirectory, 
+            regularizationThresholds = citrus.regressionResult$regularizationThresholds, 
             thresholdCVRates = citrus.regressionResult$thresholdCVRates, finalModel = citrus.regressionResult$finalModel$model, 
             cvMinima = citrus.regressionResult$cvMinima, family = citrus.regressionResult$family)
     }
     
     if ("stratifyingFeatures" %in% plotTypes) {
         cat("Plotting Stratifying Features\n")
-        do.call(paste("citrus.plotModelDifferentialFeatures", citrus.regressionResult$family, sep = "."), args = list(differentialFeatures = citrus.regressionResult$differentialFeatures, 
-            features = citrus.foldFeatureSet$allFeatures, modelOutputDirectory = modelOutputDirectory, labels = citrus.regressionResult$labels))
+        do.call(paste("citrus.plotModelDifferentialFeatures", citrus.regressionResult$family, 
+            sep = "."), args = list(differentialFeatures = citrus.regressionResult$differentialFeatures, 
+            features = citrus.foldFeatureSet$allFeatures, modelOutputDirectory = modelOutputDirectory, 
+            labels = citrus.regressionResult$labels))
     }
     
     if ("stratifyingClusters" %in% plotTypes) {
         cat("Plotting Stratifying Clusters\n")
-        citrus.plotModelClusters(differentialFeatures = citrus.regressionResult$differentialFeatures, modelOutputDirectory = modelOutputDirectory, 
-            clusterAssignments = citrus.foldClustering$allClustering$clusterMembership, citrus.combinedFCSSet = citrus.combinedFCSSet, 
-            clusteringColumns = citrus.foldClustering$allClustering$clusteringColumns, ...)
+        citrus.plotModelClusters(differentialFeatures = citrus.regressionResult$differentialFeatures, 
+            modelOutputDirectory = modelOutputDirectory, clusterAssignments = citrus.foldClustering$allClustering$clusterMembership, 
+            citrus.combinedFCSSet = citrus.combinedFCSSet, clusteringColumns = citrus.foldClustering$allClustering$clusteringColumns, 
+            ...)
     }
     
 }
@@ -334,8 +352,6 @@ plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirector
 #' @export
 #' 
 #' @author Robert Bruggner
-#' 
-#' @details See \code{\link{citrus.full}} for examples.
 plot.citrus.full.result <- function(citrus.full.result, outputDirectory) {
     
     if (!file.exists(outputDirectory)) {
@@ -346,8 +362,9 @@ plot.citrus.full.result <- function(citrus.full.result, outputDirectory) {
         cat(paste0("\nPlotting Results for ", conditionName, "\n"))
         conditionOutputDir <- file.path(outputDirectory, conditionName)
         dir.create(conditionOutputDir, showWarnings = F)
-        parallel::mclapply(citrus.full.result$conditionRegressionResults[[conditionName]], plot, outputDirectory = conditionOutputDir, 
-            citrus.foldClustering = citrus.full.result$citrus.foldClustering, citrus.foldFeatureSet = citrus.full.result$conditionFoldFeatures[[conditionName]], 
+        parallel::mclapply(citrus.full.result$conditionRegressionResults[[conditionName]], 
+            plot, outputDirectory = conditionOutputDir, citrus.foldClustering = citrus.full.result$citrus.foldClustering, 
+            citrus.foldFeatureSet = citrus.full.result$conditionFoldFeatures[[conditionName]], 
             citrus.combinedFCSSet = citrus.full.result$citrus.combinedFCSSet, family = citrus.full.result$family, 
             labels = citrus.full.result$labels, conditions = citrus.full.result$conditions[[conditionName]])
         cat("\n")

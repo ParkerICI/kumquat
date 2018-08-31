@@ -14,9 +14,6 @@
 \description{
 Plot a citrus.full.result
 }
-\details{
-See \code{\link{citrus.full}} for examples.
-}
 \author{
 Robert Bruggner
 }

@@ -6,8 +6,8 @@
 \usage{
 \method{plot}{citrus.regressionResult}(citrus.regressionResult, outputDirectory,
   citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet,
-  plotTypes = c("errorRate", "stratifyingFeatures", "stratifyingClusters",
-  "clusterGraph"), ...)
+  plotTypes = c("errorRate", "stratifyingFeatures", "stratifyingClusters"),
+  ...)
 }
 \arguments{
 \item{citrus.regressionResult}{A \code{citrus.regressionResult} object.}
@@ -21,10 +21,7 @@
 \item{citrus.combinedFCSSet}{A \code{citrus.combinedFCSSet} object.}
 
 \item{plotTypes}{Vector of plots types to make. Valid options are \code{errorRate} (Cross-validated error rates for predictive models),
-\code{stratifyingFeatures} (plots of non-zero model features),\code{stratifyingClusters} (plots of clustering marker distributions in stratifying clusters), and
-\code{clusterGraph} (Plots of clustering hierarchy graph).}
-
-\item{hierarchyGraph}{A hierarchy graph configuration created by \code{\link{citrus.createHierarchyGraph}}. If \code{NULL}, automatically generated.}
+\code{stratifyingFeatures} (plots of non-zero model features),\code{stratifyingClusters} (plots of clustering marker distributions in stratifying clusters)}
 }
 \description{
 Makes many plots showing results of a Citrus analysis

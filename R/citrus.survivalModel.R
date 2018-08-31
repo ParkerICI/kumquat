@@ -1,4 +1,5 @@
-citrus.generateRegularizationThresholds.survival <- function(features, labels, modelTypes, n, ...) {
+citrus.generateRegularizationThresholds.survival <- function(features, labels, modelTypes, 
+    n, ...) {
     stop("Survival currently unsupported.")
     addtlArgs <- list(...)
     standardize <- T
@@ -18,13 +19,15 @@ citrus.generateRegularizationThresholds.survival <- function(features, labels, m
     }
     if ("glmnet" %in% modelTypes) {
         s <- survival::Surv(time = labels[, "time"], event = labels[, "event"])
-        regs$glmnet <- glmnet::glmnet(x = features, y = s, family = "cox", alpha = alpha, nlambda = c(n - 1), standardize = standardize)$lambda
+        regs$glmnet <- glmnet::glmnet(x = features, y = s, family = "cox", alpha = alpha, 
+            nlambda = c(n - 1), standardize = standardize)$lambda
         regs$glmnet[1] <- ((regs$glmnet[1] - regs$glmnet[2]) * 1.5) + regs$glmnet[1]
     }
     return(regs)
 }
 
-citrus.buildModel.survival <- function(features, labels, type, regularizationThresholds, ...) {
+citrus.buildModel.survival <- function(features, labels, type, regularizationThresholds, 
+    ...) {
     stop("Survival currently unsupported.")
     addtlArgs <- list(...)
     alpha <- 1
@@ -37,31 +40,33 @@ citrus.buildModel.survival <- function(features, labels, type, regularizationThr
     }
     if (type == "glmnet") {
         s <- survival::Surv(time = labels[, "time"], event = labels[, "event"])
-        model <- glmnet::glmnet(x = features, y = s, family = "cox", lambda = regularizationThresholds, maxit = 2e+05, 
-            alpha = alpha, standardize = standardize)
+        model <- glmnet::glmnet(x = features, y = s, family = "cox", lambda = regularizationThresholds, 
+            maxit = 2e+05, alpha = alpha, standardize = standardize)
     } else {
         stop(paste("Type:", type, "not yet implemented"))
     }
     return(model)
 }
 
-citrus.cvIteration.survival <- function(i, modelType, features, labels, regularizationThresholds, nFolds, alpha, standardize) {
+citrus.cvIteration.survival <- function(i, modelType, features, labels, regularizationThresholds, 
+    nFolds, alpha, standardize) {
     if (modelType == "glmnet") {
         s <- survival::Surv(time = labels[, "time"], event = labels[, "event"])
-        return(glmnet::cv.glmnet(x = features, y = s, family = "cox", lambda = regularizationThresholds, nfolds = nFolds, 
-            alpha = alpha, standardize = standardize)$cvm)
+        return(glmnet::cv.glmnet(x = features, y = s, family = "cox", lambda = regularizationThresholds, 
+            nfolds = nFolds, alpha = alpha, standardize = standardize)$cvm)
     } else {
         stop(paste("Model Type", modelType, "unknown."))
     }
 }
 
-citrus.thresholdCVs.survival <- function(foldModels, foldFeatures, leftoutFeatures, modelTypes, regularizationThresholds, 
-    labels, folds, ...) {
+citrus.thresholdCVs.survival <- function(foldModels, foldFeatures, leftoutFeatures, 
+    modelTypes, regularizationThresholds, labels, folds, ...) {
     
     s <- survival::Surv(time = labels[, "time"], event = labels[, "event"])
     
-    thresholdPartialLikelihoods <- lapply(modelTypes, citrus.calculateModelPartialLikelihood, leftoutFeatures = leftoutFeatures, 
-        foldFeatures = foldFeatures, foldModels = foldModels, labels = s, folds = folds, regularizationThresholds = regularizationThresholds)
+    thresholdPartialLikelihoods <- lapply(modelTypes, citrus.calculateModelPartialLikelihood, 
+        leftoutFeatures = leftoutFeatures, foldFeatures = foldFeatures, foldModels = foldModels, 
+        labels = s, folds = folds, regularizationThresholds = regularizationThresholds)
     names(thresholdPartialLikelihoods) <- modelTypes
     
     res <- list()
@@ -73,19 +78,23 @@ citrus.thresholdCVs.survival <- function(foldModels, foldFeatures, leftoutFeatur
 }
 
 
-citrus.calculateModelPartialLikelihood <- function(modelType, leftoutFeatures, foldFeatures, foldModels, labels, folds, 
-    regularizationThresholds) {
+citrus.calculateModelPartialLikelihood <- function(modelType, leftoutFeatures, foldFeatures, 
+    foldModels, labels, folds, regularizationThresholds) {
     nFolds <- length(leftoutFeatures)
     nAllFolds <- nFolds + 1
     
     if (modelType == "glmnet") {
-        cvRaw <- matrix(NA, ncol = length(regularizationThresholds[[modelType]]), nrow = nFolds)
+        cvRaw <- matrix(NA, ncol = length(regularizationThresholds[[modelType]]), 
+            nrow = nFolds)
         for (foldId in 1:nFolds) {
             coefmat <- predict(foldModels[[modelType]][[foldId]], type = "coeff")
-            plFull <- coxnet.deviance(x = rbind(foldFeatures[[foldId]], leftoutFeatures[[foldId]]), y = rbind(labels[-folds[[foldId]], 
-                ], labels[folds[[foldId]], ]), offset = NULL, weights = rep(1, nrow(foldFeatures[[nAllFolds]])), beta = coefmat)
-            plLeaveIn <- coxnet.deviance(x = foldFeatures[[foldId]], y = labels[-folds[[foldId]], ], offset = NULL, 
-                weights = rep(1, nrow(foldFeatures[[foldId]])), beta = coefmat)
+            plFull <- coxnet.deviance(x = rbind(foldFeatures[[foldId]], leftoutFeatures[[foldId]]), 
+                y = rbind(labels[-folds[[foldId]], ], labels[folds[[foldId]], ]), 
+                offset = NULL, weights = rep(1, nrow(foldFeatures[[nAllFolds]])), 
+                beta = coefmat)
+            plLeaveIn <- coxnet.deviance(x = foldFeatures[[foldId]], y = labels[-folds[[foldId]], 
+                ], offset = NULL, weights = rep(1, nrow(foldFeatures[[foldId]])), 
+                beta = coefmat)
             cvRaw[foldId, seq(along = plFull)] <- plFull - plLeaveIn
         }
         
@@ -95,13 +104,16 @@ citrus.calculateModelPartialLikelihood <- function(modelType, leftoutFeatures, f
         }
         
         N <- nFolds - apply(is.na(cvRaw), 2, sum)
-        weights <- as.vector(tapply(rep(1, nrow(foldFeatures[[nAllFolds]])) * labels[, "status"], foldid, sum))
+        weights <- as.vector(tapply(rep(1, nrow(foldFeatures[[nAllFolds]])) * labels[, 
+            "status"], foldid, sum))
         cvRaw <- cvRaw/weights
         cvm <- apply(cvRaw, 2, weighted.mean, w = weights, na.rm = TRUE)
-        cvsd <- sqrt(apply(scale(cvRaw, cvm, FALSE)^2, 2, weighted.mean, w = weights, na.rm = TRUE)/(N - 1))
+        cvsd <- sqrt(apply(scale(cvRaw, cvm, FALSE)^2, 2, weighted.mean, w = weights, 
+            na.rm = TRUE)/(N - 1))
         return(list(cvm = cvm, cvsd = cvsd))
     } else {
-        stop(paste("Partial Likelihood calculations not implemented for model type", modelType))
+        stop(paste("Partial Likelihood calculations not implemented for model type", 
+            modelType))
     }
 }
 

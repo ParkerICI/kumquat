@@ -7,7 +7,7 @@
 \method{plot}{citrus.regressionResult}(citrus.regressionResult, outputDirectory,
   citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet,
   plotTypes = c("errorRate", "stratifyingFeatures", "stratifyingClusters"),
-  ...)
+  byCluster = FALSE, allFeatures = FALSE, ...)
 }
 \arguments{
 \item{citrus.regressionResult}{A \code{citrus.regressionResult} object.}

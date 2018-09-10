@@ -149,11 +149,35 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
     dev.off()
 }
 
+
+getFeaturesPlot.classification <- function(melted) {
+    p <- (ggplot2::ggplot(melted, ggplot2::aes(x = factor(labels), y = value)) 
+          + ggplot2::facet_wrap(~variable, ncol = 1) 
+          + ggplot2::geom_boxplot(outlier.colour = rgb(0, 0, 0, 0), colour = rgb(0, 0, 0, 0.3)) 
+          + ggplot2::geom_point(ggplot2::aes(color = factor(labels)), alpha = I(0.25), shape = 19, size = I(2)) 
+          + ggplot2::coord_flip() 
+          + ggplot2::theme_bw() 
+          + ggplot2::ylab("") 
+          + ggplot2::xlab("") 
+          + ggplot2::theme(legend.position = "none")
+    )
+    #if (any(grepl(pattern = "abundance", nonzeroFeatureNames))) {
+    #    p <- p + ggplot2::scale_y_log10() + ggplot2::ylab("Log10 scale")
+    #}
+    return(p)
+}
+
 citrus.plotModelDifferentialFeatures.classification <- function(differentialFeatures, 
-    features, modelOutputDirectory, labels, ...) {
+    features, modelOutputDirectory, labels, byCluster = FALSE, allFeatures = FALSE) {
+    cvPoints <- names(differentialFeatures)
+    if(allFeatures)
+        cvPoints <- c(cvPoints, "allFeatures")
  
-    for (cvPoint in names(differentialFeatures)) {
-        nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
+    for (cvPoint in cvPoints) {
+        if(cvPoint == "allFeatures")
+            nonzeroFeatureNames <- colnames(features)
+        else
+            nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
         
         # Write features to file for easy parsing
         write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, 
@@ -162,27 +186,25 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
         melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
             labels = labels, check.names = F), id.vars = "labels")
         
+        melted$cluster <- sapply(strsplit(as.character(melted$variable), "_"), "[", 2)
         
-        pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", 
-            replacement = "_", x = cvPoint), ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 
-            1.5)
-        p <- (ggplot2::ggplot(melted, ggplot2::aes(x = factor(labels), y = value)) 
-                + ggplot2::facet_wrap(~variable, ncol = 1) 
-                + ggplot2::geom_boxplot(outlier.colour = rgb(0, 0, 0, 0), colour = rgb(0, 0, 0, 0.3)) 
-                + ggplot2::geom_point(ggplot2::aes(color = factor(labels)), alpha = I(0.25), shape = 19, size = I(2)) 
-                + ggplot2::coord_flip() 
-                + ggplot2::theme_bw() 
-                + ggplot2::ylab("") 
-                + ggplot2::xlab("") 
-                + ggplot2::theme(legend.position = "none")
-        )
-        if (any(grepl(pattern = "abundance", nonzeroFeatureNames))) {
-            p <- p + ggplot2::scale_y_log10() + ggplot2::ylab("Log10 scale")
+        cvPoint <- sub(pattern = "\\.", replacement = "_", x = cvPoint)
+        
+        
+        if(byCluster) {
+            outDir <- file.path(modelOutputDirectory, cvPoint)
+            dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
+            plyr::d_ply(melted, ~cluster, function(x) {
+                p <- getFeaturesPlot.classification(x)
+                ggplot2::ggsave(file.path(outDir, paste("c", x$cluster[1], ".pdf", sep = "")), plot = p)
+            })
         }
-        print(p)
-        dev.off()
+        
+        p <- getFeaturesPlot.classification(melted)
+        
+        ggplot2::ggsave(file.path(modelOutputDirectory, paste("features-", cvPoint, ".pdf", sep = "")), 
+                        plot = p, width = 4, height = length(nonzeroFeatureNames) * 1.5, limitsize = FALSE)
     }
-    
 }
 
 citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures, 
@@ -315,7 +337,7 @@ citrus.plotClusters <- function(clusterIds, clusterAssignments, citrus.combinedF
 #' 
 plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirectory, 
     citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet, plotTypes = c("errorRate", 
-        "stratifyingFeatures", "stratifyingClusters"), ...) {
+        "stratifyingFeatures", "stratifyingClusters"), byCluster = FALSE, allFeatures = FALSE, ...) {
     addtlArgs <- list(...)
     
     theme <- "black"
@@ -344,7 +366,7 @@ plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirector
         do.call(paste("citrus.plotModelDifferentialFeatures", citrus.regressionResult$family, 
             sep = "."), args = list(differentialFeatures = citrus.regressionResult$differentialFeatures, 
             features = citrus.foldFeatureSet$allFeatures, modelOutputDirectory = modelOutputDirectory, 
-            labels = citrus.regressionResult$labels))
+            labels = citrus.regressionResult$labels, byCluster = byCluster, allFeatures = allFeatures))
     }
     
     if ("stratifyingClusters" %in% plotTypes) {

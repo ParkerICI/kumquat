@@ -10,5 +10,5 @@ Description: Automated identification of clusters whose behavior differs
     between sample groups.
 License: GPL-3
 Imports:
-    pamr,glmnet,samr,ggplot2,flowCore,igraph,survival,parallel,reshape2
+    pamr,glmnet,samr,ggplot2,flowCore,igraph,survival,parallel,reshape2,plyr
 RoxygenNote: 6.0.1

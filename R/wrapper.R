@@ -25,7 +25,7 @@ run_citrus_analysis <- function(citrus.features, endpoint, working.directory, mo
         labels = endpoint, family = family)
     
     plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, 
-        citrus.combinedFCSSet = NULL, c("stratifyingFeatures", "errorRate"))
+        citrus.combinedFCSSet = NULL, c("stratifyingFeatures", "errorRate"), byCluster = TRUE, allFeatures = TRUE)
     return(citrus.res)
     
 }

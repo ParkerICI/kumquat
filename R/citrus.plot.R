@@ -1,39 +1,9 @@
-######################## Helper Functions
-.graphColorPalette <- function(x, alpha = 1) {
-    # rainbow(x,alpha=.8,start=.65,end=.15)
-    topo.colors(x, alpha = alpha)
-}
-
-.formatDecimal <- function(x) {
-    sprintf("%1.2f", x)
-}
-
-
-.getClusterMedians <- function(clusterId, clusterAssignments, clusterCols, data) {
-    apply(data[clusterAssignments[[clusterId]], clusterCols], 2, median)
-}
-
-.decimalFormat <- function(x) {
-    sprintf("%.2f", x)
-}
-
-.scaleToOne <- function(x) {
-    x <- x - min(x)
-    x <- x/max(x)
-    return(x)
-}
-
-.getClusterFeatureMatrix <- function(featureVector) {
-    df <- do.call("rbind", strsplit(gsub(pattern = "(cluster [0-9]+) ", replacement = "\\1~", 
-        featureVector), "~"))
-    return(cbind(cluster = do.call("rbind", strsplit(df[, 1], " "))[, 2], feature = df[, 
-        2]))
-}
 
 citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regularizationThresholds, 
     thresholdCVRates, finalModel, cvMinima, family) {
     if (modelType == "sam") {
-        return()
+        message("Error rate plots are not available for sam models")
+        return(invisible(NULL))
     }
     
     pdf(file.path(modelOutputDirectory, "ModelErrorRate.pdf"), width = 6, height = 6)
@@ -65,7 +35,7 @@ citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regulariza
             thresholdCVRates[, "cvsd"][i]), col = "red", lty = 3)
     }
     grid()
-    axis(1, at = 1:length(errorRates), labels = sapply(thresholds, .formatDecimal))
+    axis(1, at = 1:length(errorRates), labels = sapply(thresholds, sprintf, fmt = "%1.2f"))
     if (family == "survival") {
         axis(2)
     } else {

@@ -1,5 +1,7 @@
 #' @export
-convert_to_citrus_featureset <- function(tab, endpoint.grouping) {
+convert_to_citrus_featureset <- function(tab) {
+    endpoint.grouping <- grep("cluster_", names(tab), invert = TRUE, value = TRUE)
+    
     rnames <- do.call(paste, list(tab[, endpoint.grouping], sep = "_"))
     cnames <- setdiff(colnames(tab), endpoint.grouping)
     ret <- as.matrix(tab[, cnames])
@@ -12,7 +14,8 @@ convert_to_citrus_featureset <- function(tab, endpoint.grouping) {
 }
 
 #' @export
-run_citrus_analysis <- function(citrus.features, endpoint, working.directory, model.type) {
+run_citrus_analysis <- function(citrus.features, endpoint, working.directory, model.type, plot.by.cluster = FALSE,
+                                plot.all.features = FALSE, clusters.data = NULL) {
     family <- NULL
     
     if (is.character(endpoint) || is.factor(endpoint)) {
@@ -24,8 +27,14 @@ run_citrus_analysis <- function(citrus.features, endpoint, working.directory, mo
     citrus.res <- citrus::citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
         labels = endpoint, family = family)
     
+    #plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, 
+    #    citrus.combinedFCSSet = NULL, c("stratifyingFeatures", "errorRate", "stratifyingClusters"), 
+    #    byCluster = plot.by.cluster, allFeatures = plot.all.features, clustersData = clusters.data)
+    
     plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, 
-        citrus.combinedFCSSet = NULL, c("stratifyingFeatures", "errorRate"), byCluster = TRUE, allFeatures = TRUE)
+         citrus.combinedFCSSet = NULL, c("stratifyingClusters"), 
+         byCluster = plot.by.cluster, allFeatures = plot.all.features, clustersData = clusters.data)
+    
     return(citrus.res)
     
 }

@@ -8,32 +8,6 @@
     sprintf("%1.2f", x)
 }
 
-.getDisplayNames <- function(citrus.combinedFCSSet, clusteringColumns) {
-    
-    # Get channel names colLabels = citrus.combinedFCSSet$fileChannelNames[[1]][[1]]
-    
-    # Get reagent names reagentNames =
-    # citrus.combinedFCSSet$fileReagentNames[[1]][[1]]
-    
-    # Set display names to channel names displayNames = colLabels
-    
-    # update display names to equal reagent names where reagent names > 2
-    # displayNames[nchar(reagentNames)>2] = reagentNames[nchar(reagentNames)>2]
-    
-    displayNames <- citrus.combinedFCSSet$fileReagentNames[[1]][[1]]
-    
-    if (all(is.numeric(clusteringColumns))) {
-        # If clustering columns is numeric, pass back the indices
-        return(displayNames[clusteringColumns])
-    } else {
-        # Otherwise, set the names of display names to be the channel names
-        # names(displayNames) = colLabels
-        names(displayNames) <- citrus.combinedFCSSet$fileChannelNames[[1]][[1]]
-        # and return the display names from the corresponding clustering columns
-        return(as.vector(displayNames[clusteringColumns]))
-    }
-    
-}
 
 .getClusterMedians <- function(clusterId, clusterAssignments, clusterCols, data) {
     apply(data[clusterAssignments[[clusterId]], clusterCols], 2, median)
@@ -239,10 +213,11 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
     
 }
 
-citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
+citrus.overlapDensityPlot.old <- function(clusterDataList, backgroundData) {
     combined <- data.frame(check.names = F, check.rows = F)
+
     for (clusterName in names(clusterDataList)) {
-        combined <- rbind(combined, cbind(melt(clusterDataList[[clusterName]], varnames = c("row", 
+        combined <- rbind(combined, cbind(reshape2::melt(clusterDataList[[clusterName]], varnames = c("row", 
             "marker")), clusterId = clusterName, src = "Cluster"))
     }
     p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., fill = src)) 
@@ -255,17 +230,40 @@ citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
                 axis.ticks.y = ggplot2::element_blank(), axis.title = ggplot2::element_blank()) 
             + ggplot2::labs(fill = "Distribution:")
         )
-    print(p)
+    return(p)
+}
+
+get_cluster_density_plots <- function(clusters.data, background.data) {
+    clusters.data$type <- "Cluster"
+    background.data$type <- "Background"
+
+    tab <- rbind(clusters.data, background.data)
+    tab$cellType <- NULL
+    m <- reshape2::melt(tab, id.vars = "type")
+    
+    p <- (ggplot2::ggplot(data = m, ggplot2::aes(x = value, fill = type)) 
+          + ggplot2::geom_density() 
+          + ggplot2::facet_wrap(~ variable, scales = "free") 
+          + ggplot2::theme_bw() 
+          + ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), Cluster = rgb(1, 0.3, 0.3, 0.5))) 
+          #+ ggplot2::theme(axis.text.y = ggplot2::element_blank(), 
+          #                 axis.ticks.y = ggplot2::element_blank(), axis.title = ggplot2::element_blank()) 
+
+    )
+    return(p)
+    
 }
 
 citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory, 
-    clusterAssignments, citrus.combinedFCSSet, clusteringColumns, ...) {
+    clustersData) {
+    # Drop non-numeric columns
+    clustersData <- clustersData[, sapply(clustersData, is.numeric)]
+    
     for (cvPoint in names(differentialFeatures)) {
         clusterIds <- as.numeric(differentialFeatures[[cvPoint]][["clusters"]])
         outputFile <- file.path(modelOutputDirectory, paste("clusters-", sub(pattern = "\\.", 
             replacement = "_", x = cvPoint), ".pdf", sep = ""))
-        citrus.plotClusters(clusterIds, clusterAssignments = clusterAssignments, 
-            citrus.combinedFCSSet, clusteringColumns, outputFile = outputFile, ...)
+        citrus.plotClusters(clusterIds, clustersData, outputDir = modelOutputDirectory)
     }
 }
 
@@ -279,44 +277,44 @@ citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory,
 #' @param clusteringColumns Columns for which to plot distributions
 #' @param conditions Vector of conditions clustering was performed on.
 #' @param outputFile If not \code{NULL}, plot is written to \code{outputFile}.
-#' @param ... Other parameters (ignored).
 #' 
 #' @author Robert Bruggner
 #' @export
-citrus.plotClusters <- function(clusterIds, clusterAssignments, citrus.combinedFCSSet, 
-    clusteringColumns, conditions = NULL, outputFile = NULL, ...) {
+citrus.plotClusters <- function(clusterIds, clustersData, conditions = NULL, outputDir = NULL) {
     
-    data <- citrus.combinedFCSSet$data
+    data <- clustersData
     
-    if (!is.null(outputFile)) {
-        pdf(file = outputFile, width = (2.2 * length(clusteringColumns) + 2), height = (2 * 
-            length(clusterIds)))
-    }
-    clusterDataList <- list()
+    #clusterDataList <- list()
+    
+    bgData <- data
+    
+    if (nrow(bgData) > 5000) 
+        bgData <- bgData[sample(1:nrow(bgData), 5000), ]
+    
     for (clusterId in sort(clusterIds)) {
-        if (length(clusterAssignments[[clusterId]]) > 2500) {
-            clusterDataList[[as.character(clusterId)]] <- data[clusterAssignments[[clusterId]], 
-                clusteringColumns][sample(1:length(clusterAssignments[[clusterId]]), 
-                2500), ]
-        } else {
-            clusterDataList[[as.character(clusterId)]] <- data[clusterAssignments[[clusterId]], 
-                clusteringColumns]
-        }
+        temp <- clustersData[clustersData$cellType == clusterId, ]
+
+        if (nrow(temp) > 2500) 
+            temp <- temp[sample(1:nrow(temp), 2500), ]
+      
+        p <- get_cluster_density_plots(temp, bgData)
+        plotDim <- (ncol(data) / 4) + 1
         
-        colnames(clusterDataList[[as.character(clusterId)]]) <- .getDisplayNames(citrus.combinedFCSSet, 
-            clusteringColumns)
+        ggplot2::ggsave(file.path(outputDir, sprintf("c%d.pdf", clusterId)), plot = p, 
+                        width = plotDim, height = plotDim, limitsize = FALSE)
         
+        #clusterDataList[[as.character(clusterId)]] <- temp
     }
-    if (nrow(data) > 2500) {
-        bgData <- data[sample(1:nrow(data), 2500), clusteringColumns]
-    } else {
-        bgData <- data[, clusteringColumns]
-    }
-    colnames(bgData) <- colnames(clusterDataList[[1]])
-    citrus.overlapDensityPlot(clusterDataList = clusterDataList, backgroundData = bgData)
-    if (!is.null(outputFile)) {
-        dev.off()
-    }
+
+   #
+    #p <- citrus.overlapDensityPlot(clusterDataList = clusterDataList, backgroundData = bgData)
+    
+    ##if (!is.null(outputFile)) {
+    #    ggplot2::ggsave(p, outputFile, width = (2.2 * ncol(data) + 2), height = (2* length(clusterIds)))
+    #    return(invisible(NULL))
+    #} else 
+    #    return(p)
+    
 }
 
 #' Plot results of a Citrus regression analysis
@@ -337,7 +335,7 @@ citrus.plotClusters <- function(clusterIds, clusterAssignments, citrus.combinedF
 #' 
 plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirectory, 
     citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet, plotTypes = c("errorRate", 
-        "stratifyingFeatures", "stratifyingClusters"), byCluster = FALSE, allFeatures = FALSE, ...) {
+        "stratifyingFeatures", "stratifyingClusters"), byCluster = FALSE, allFeatures = FALSE, clustersData = NULL, ...) {
     addtlArgs <- list(...)
     
     theme <- "black"
@@ -372,9 +370,7 @@ plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirector
     if ("stratifyingClusters" %in% plotTypes) {
         cat("Plotting Stratifying Clusters\n")
         citrus.plotModelClusters(differentialFeatures = citrus.regressionResult$differentialFeatures, 
-            modelOutputDirectory = modelOutputDirectory, clusterAssignments = citrus.foldClustering$allClustering$clusterMembership, 
-            citrus.combinedFCSSet = citrus.combinedFCSSet, clusteringColumns = citrus.foldClustering$allClustering$clusteringColumns, 
-            ...)
+            modelOutputDirectory = modelOutputDirectory, clustersData = clustersData)
     }
     
 }

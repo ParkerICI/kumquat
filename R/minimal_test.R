@@ -12,7 +12,7 @@ minimal_test <- function() {
         "sample", out.format = "table")
     
     
-    ff <- convert_to_citrus_featureset(kk, "sample")
+    ff <- convert_to_citrus_featureset(kk)
     sam.model <- run_citrus_analysis(ff, metadata.tab$label, "./", "sam")
     glmnet.model <- run_citrus_analysis(ff, metadata.tab$label, "./", "glmnet")
     
@@ -35,9 +35,13 @@ minimal_test2 <- function() {
     kk <- grappolo::get_cluster_features(tab, metadata.tab, features.names, predictors = "condition", 
                                          endpoint.grouping = "file", out.format = "table")
     
+    clusters.data <- readRDS("all.pooled.clustered.all_events.rds")
     
-    ff <- convert_to_citrus_featureset(kk, "file")
-    sam.model <- run_citrus_analysis(ff, metadata.tab$tissue, "./", "sam")
+    
+    ff <- convert_to_citrus_featureset(kk)
+    sam.model <- run_citrus_analysis(ff, metadata.tab$tissue, "./", "sam", clusters.data = clusters.data)
+
+    
     glmnet.model <- run_citrus_analysis(ff, metadata.tab$tissue, "./", "glmnet")
     
     message("#########################")

@@ -4,11 +4,13 @@
 \alias{citrus.plotClusters}
 \title{Plot cluster histograms}
 \usage{
-citrus.plotClusters(clusterIds, clusterAssignments, citrus.combinedFCSSet,
-  clusteringColumns, conditions = NULL, outputFile = NULL, ...)
+citrus.plotClusters(clusterIds, clustersData, conditions = NULL,
+  outputDir = NULL)
 }
 \arguments{
 \item{clusterIds}{Vector of cluster IDs to plot}
+
+\item{conditions}{Vector of conditions clustering was performed on.}
 
 \item{clusterAssignments}{List containing indicies of cells assigned to each cluster.}
 
@@ -16,11 +18,7 @@ citrus.plotClusters(clusterIds, clusterAssignments, citrus.combinedFCSSet,
 
 \item{clusteringColumns}{Columns for which to plot distributions}
 
-\item{conditions}{Vector of conditions clustering was performed on.}
-
 \item{outputFile}{If not \code{NULL}, plot is written to \code{outputFile}.}
-
-\item{...}{Other parameters (ignored).}
 }
 \description{
 Plot expression of markers in cluster cells relative to all cells

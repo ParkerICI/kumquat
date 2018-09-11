@@ -1,14 +1,12 @@
-Package: citrus
+Package: kumquat
 Type: Package
-Title: Citrus: Identification of stratifying subpopulations in Flow Cytometry
-    Data.
-Version: 0.08
-Date: 2012-12-04
-Author: Robert Bruggner
-Maintainer: Robert Bruggner <rbruggner@gmail.com>
+Title: Identification of stratifying subpopulations in Flow Cytometry
+    Data  (based on the Citrus package)
+Version: 0.1.0
+Authors@R: "Pier Federico Gherardini <pfgherardini@parkerici.org> [aut, cre]"
 Description: Automated identification of clusters whose behavior differs
     between sample groups.
 License: GPL-3
 Imports:
-    pamr,glmnet,samr,ggplot2,flowCore,igraph,survival,parallel,reshape2,plyr
+    pamr,glmnet,samr,ggplot2,flowCore,survival,parallel,reshape2,plyr
 RoxygenNote: 6.0.1

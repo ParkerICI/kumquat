@@ -10,7 +10,7 @@
 #' @return A vector of cluster IDs. 
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.selectClusters <- function(citrus.clustering, method = "minimumClusterSize", 
     ...) {
     do.call(paste0("citrus.selectClusters.", method), args = list(citrus.clustering = citrus.clustering, 
@@ -29,7 +29,7 @@ citrus.selectClusters <- function(citrus.clustering, method = "minimumClusterSiz
 #' @param ... Other arguments (ignored).
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.selectClusters.minimumClusterSize <- function(citrus.clustering, minimumClusterSizePercent = 0.05, 
     ...) {
     clusterSizes <- sapply(citrus.clustering$clusterMembership, length)
@@ -58,7 +58,7 @@ citrus.convertConditionMatrix <- function(conditionMatrix) {
 #' @return Vector of model types that Citrus can compute.
 #' 
 #' @author Robert Bruggner
-#' @export
+#'
 citrus.modelTypes <- function() {
     return(c("pamr", "glmnet", "sam"))
 }

@@ -1,6 +1,6 @@
 #' @rdname citrus.buildEndpointModel
 #' @name citrus.buildEndpointModel
-#' @export
+#' 
 citrus.buildModel.classification <- function(features, labels, type, regularizationThresholds, 
     ...) {
     
@@ -49,7 +49,7 @@ citrus.buildModel.classification <- function(features, labels, type, regularizat
 
 #' @rdname citrus.thresholdCVs
 #' @name citrus.thresholdCVs
-#' @export
+#' 
 citrus.thresholdCVs.quick.classification <- function(modelType, features, labels, 
     regularizationThresholds, nCVFolds = 10, ...) {
     
@@ -111,7 +111,7 @@ foldScore.classification <- function(index, folds, predictions, labels) {
 
 #' @rdname citrus.predict
 #' @name citrus.predict
-#' @export
+#' 
 citrus.predict.classification <- function(citrus.endpointModel, newFeatures) {
     if (citrus.endpointModel$type == "glmnet") {
         predictions <- predict(citrus.endpointModel$model, newx = newFeatures, type = "class")
@@ -126,7 +126,7 @@ citrus.predict.classification <- function(citrus.endpointModel, newFeatures) {
 
 #' @rdname citrus.generateRegularizationThresholds
 #' @name citrus.generateRegularizationThresholds
-#' @export
+#' 
 citrus.generateRegularizationThresholds.classification <- function(features, labels, 
     modelType, n = 100, ...) {
     addtlArgs <- list(...)

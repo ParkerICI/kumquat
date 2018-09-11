@@ -39,8 +39,12 @@ minimal_test2 <- function() {
     
     
     ff <- convert_to_citrus_featureset(kk)
-    sam.model <- run_citrus_analysis(ff, metadata.tab$tissue, "./", "sam", clusters.data = clusters.data)
+    sam.model <- get_model(ff, metadata.tab$tissue, "./", "sam")
 
+    
+    
+    ######################################
+    
     
     glmnet.model <- run_citrus_analysis(ff, metadata.tab$tissue, "./", "glmnet")
     

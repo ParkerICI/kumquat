@@ -213,21 +213,16 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
     
 }
 
-citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
-
-    #browser()
-    combined <- lapply(names(clusterDataList), function(clusterName) {
-        ret <- reshape2::melt(clusterDataList[[clusterName]])
-        ret <- data.frame(ret, clusterId = clusterName, src = "Cluster", check.names = FALSE)
-        return(ret)
-    })
-    combined <- do.call(rbind, combined)
-    backgroundData <- reshape2::melt(backgroundData)
-    backgroundData <- data.frame(backgroundData, src = "Background")
+citrus.densityPlotGrid <- function(clustersData, backgroundData) {
+    clustersData <- reshape2::melt(clustersData, id.vars = "cellType")
+    clustersData <- data.frame(clustersData, src = "Cluster", check.names = FALSE, stringsAsFactors = FALSE)
     
-    p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., fill = src)) 
+    backgroundData <- reshape2::melt(backgroundData)
+    backgroundData <- data.frame(backgroundData, src = "Background", check.names = FALSE, stringsAsFactors = FALSE)
+    
+    p <- (ggplot2::ggplot(data = clustersData, ggplot2::aes(x = value, y = ..scaled.., fill = src)) 
             + ggplot2::geom_density() 
-            + ggplot2::facet_grid(clusterId ~ variable, scales = "free") 
+            + ggplot2::facet_grid(cellType ~ variable, scales = "free") 
             + ggplot2::geom_density(data = backgroundData) 
             + ggplot2::theme_bw() 
             + ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), Cluster = rgb(1, 0.3, 0.3, 0.5))) 
@@ -239,11 +234,11 @@ citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
     return(p)
 }
 
-get_cluster_density_plots <- function(clusters.data, background.data) {
-    clusters.data$type <- "Cluster"
-    background.data$type <- "Background"
+citrus.clusterDensityPlots <- function(clustersData, backgroundData) {
+    clustersData$type <- "Cluster"
+    backgroundData$type <- "Background"
 
-    tab <- rbind(clusters.data, background.data)
+    tab <- rbind(clustersData, backgroundData)
     tab$cellType <- NULL
     m <- reshape2::melt(tab, id.vars = "type")
     
@@ -252,25 +247,9 @@ get_cluster_density_plots <- function(clusters.data, background.data) {
           + ggplot2::facet_wrap(~ variable, scales = "free") 
           + ggplot2::theme_bw() 
           + ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), Cluster = rgb(1, 0.3, 0.3, 0.5))) 
-          #+ ggplot2::theme(axis.text.y = ggplot2::element_blank(), 
-          #                 axis.ticks.y = ggplot2::element_blank(), axis.title = ggplot2::element_blank()) 
-
     )
     return(p)
     
-}
-
-citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory, 
-    clustersData) {
-    # Drop non-numeric columns
-    clustersData <- clustersData[, sapply(clustersData, is.numeric)]
-    
-    for (cvPoint in names(differentialFeatures)) {
-        clusterIds <- as.numeric(differentialFeatures[[cvPoint]][["clusters"]])
-        outputFile <- file.path(modelOutputDirectory, paste("clusters-", sub(pattern = "\\.", 
-            replacement = "_", x = cvPoint), ".pdf", sep = ""))
-        citrus.plotClusters(clusterIds, clustersData, outputDir = modelOutputDirectory)
-    }
 }
 
 #' Plot cluster histograms
@@ -278,53 +257,64 @@ citrus.plotModelClusters <- function(differentialFeatures, modelOutputDirectory,
 #' Plot expression of markers in cluster cells relative to all cells
 #' 
 #' @param clusterIds Vector of cluster IDs to plot
-#' @param clusterAssignments List containing indicies of cells assigned to each cluster.
-#' @param citrus.combinedFCSSet Combined FCS data that was clustered.
-#' @param clusteringColumns Columns for which to plot distributions
-#' @param conditions Vector of conditions clustering was performed on.
-#' @param outputFile If not \code{NULL}, plot is written to \code{outputFile}.
+#' @param clustersData \code{data.frame} containing the clusters data. Each row is a cell
+#'   and column represents the expression of different markers (non numeric columns are dropped). 
+#'   The \code{data.frame} must contain a column called \code{cellType} which indicates the cluster assignments. 
+#'   The values in \code{clusterIds} must match the values in \code{cellType}.  
+#' @param colNames Which columns of \code{clustersData} to include in the plot. The default is to include all
+#'   columns in the plot
+#' @param byCluster Whether to have a separate plot for each cluster (default), or a single plot with all the
+#'   clusters. The latter option may take quite long to plot if there are several clusters
+#' @param outputDir The directory in which the plots will be written (only used if \code{byCluster == TRUE}).
+#' @param outputFile The output file the plot will be written to (only used if \code{byCluster == FALSE}). Note that
+#'   this needs to be the full path to the file, as \code{outputDir} is ignored when \code{byCluster == FALSE}. If
+#'   this parameter is \code{NULL} and \code{byCluster == FALSE} no file will be written 
+#'   (and the plot will be returned invisibly)
+#'   
+#' @return Either \code{NULL} if \code{byCluster == TRUE} or a \code{ggplot2} plot object otherwise
 #' 
-#' @author Robert Bruggner
-#' @export
-citrus.plotClusters <- function(clusterIds, clustersData, conditions = NULL, outputDir = NULL) {
-    
-    data <- clustersData
+citrus.plotClusters <- function(clusterIds, clustersData, colNames = names(clustersData), 
+                                byCluster = TRUE, outputDir = NULL, outputFile = NULL) {
+    data <- clustersData[, colNames]
+    data <- data[, sapply(data, is.numeric)]
+    data$cellType <- clustersData$cellType
     
     clusterDataList <- list()
-    
     bgData <- data
+    bgData$cellType <- NULL
     
     if (nrow(bgData) > 5000) 
         bgData <- bgData[sample(1:nrow(bgData), 5000), ]
     
     
-    print("FIXMEE")
-    clusterIds <- clusterIds[1:5]
-    
     for (clusterId in sort(clusterIds)) {
-        temp <- clustersData[clustersData$cellType == clusterId, ]
+        temp <- data[data$cellType == clusterId, ]
 
         if (nrow(temp) > 2500) 
             temp <- temp[sample(1:nrow(temp), 2500), ]
       
-        #p <- get_cluster_density_plots(temp, bgData)
-        #plotDim <- (ncol(data) / 4) + 1
-        
-        #ggplot2::ggsave(file.path(outputDir, sprintf("c%d.pdf", clusterId)), plot = p, 
-        #                width = plotDim, height = plotDim, limitsize = FALSE)
-        
-        clusterDataList[[as.character(clusterId)]] <- temp
+        if(byCluster) {
+            p <- citrus.clusterDensityPlots(temp, bgData)
+            plotDim <- (ncol(data) / 4) + 1
+            
+            ggplot2::ggsave(file.path(outputDir, sprintf("c%d.pdf", clusterId)), plot = p, 
+                            width = plotDim, height = plotDim, limitsize = FALSE)
+        } else {
+            clusterDataList[[as.character(clusterId)]] <- temp
+        }
     }
 
-   #
-    p <- citrus.overlapDensityPlot(clusterDataList = clusterDataList, backgroundData = bgData)
-    outputFile <- file.path(outputDir, "test.pdf")
+    if(!byCluster) {
+        clustersData <- do.call(rbind, clusterDataList)
+        p <- citrus.densityPlotGrid(clustersData, bgData)
     
-    if (!is.null(outputFile)) {
-        ggplot2::ggsave(outputFile, p, width = (2.2 * ncol(data) + 2), height = (2* length(clusterIds)), limitsize = FALSE)
+        if (!is.null(outputFile)) 
+            ggplot2::ggsave(outputFile, p, width = (2.2 * ncol(data) + 2), height = (2* length(clusterIds)), limitsize = FALSE)
+        return(invisible(p))
+    
+    } else {
         return(invisible(NULL))
-    } else 
-        return(p)
+    }
     
 }
 
@@ -333,7 +323,7 @@ citrus.plotClusters <- function(clusterIds, clustersData, conditions = NULL, out
 #' Makes many plots showing results of a Citrus analysis
 #' 
 #' @name plot.citrus.regressionResult
-#' @export 
+#' 
 #' 
 #' @param citrus.regressionResult A \code{citrus.regressionResult} object.
 #' @param outputDirectory Full path to output directory for plots.
@@ -391,7 +381,7 @@ plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirector
 #' @param citrus.full.result A citrus.full.result object
 #' @param outputDirectory Full path to directory in which to place plot output. 
 #' 
-#' @export
+#' 
 #' 
 #' @author Robert Bruggner
 plot.citrus.full.result <- function(citrus.full.result, outputDirectory) {

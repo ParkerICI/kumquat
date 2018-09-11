@@ -13,9 +13,9 @@ convert_to_citrus_featureset <- function(tab) {
     return(ret)
 }
 
-#' @export
-run_citrus_analysis <- function(citrus.features, endpoint, working.directory, model.type, plot.by.cluster = FALSE,
-                                plot.all.features = FALSE, clusters.data = NULL) {
+
+#' @export 
+get_model <- function(citrus.features, endpoint, working.directory, model.type) {
     family <- NULL
     
     if (is.character(endpoint) || is.factor(endpoint)) {
@@ -25,15 +25,19 @@ run_citrus_analysis <- function(citrus.features, endpoint, working.directory, mo
     } else family <- "continuous"
     
     citrus.res <- citrus::citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
-        labels = endpoint, family = family)
+                                                 labels = endpoint, family = family)
     
-    #plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, 
-    #    citrus.combinedFCSSet = NULL, c("stratifyingFeatures", "errorRate", "stratifyingClusters"), 
-    #    byCluster = plot.by.cluster, allFeatures = plot.all.features, clustersData = clusters.data)
+    return(citrus.res)
     
-    plot(citrus.res, working.directory, citrus.foldClustering = NULL, citrus.foldFeatureSet = citrus.features, 
-         citrus.combinedFCSSet = NULL, c("stratifyingClusters"), 
-         byCluster = plot.by.cluster, allFeatures = plot.all.features, clustersData = clusters.data)
+}
+
+
+#' @export
+run_citrus_analysis <- function(citrus.features, endpoint, working.directory, model.type, plot.by.cluster = FALSE,
+                                plot.all.features = FALSE, clusters.data = NULL) {
+
+    
+    citrus.res <- citrus::citrus.endpointRegress(citrus.features, endpoint, working.directory, model.type)
     
     return(citrus.res)
     

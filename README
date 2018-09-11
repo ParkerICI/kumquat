@@ -1,2 +1,6 @@
 - install impute from bioconductor
 - install samr manually from the archive source
+
+
+PAMR simply returns a list of significant clusters
+

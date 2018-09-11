@@ -1,6 +1,6 @@
 #' @rdname citrus.buildEndpointModel
 #' @name citrus.buildEndpointModel
-#' @export
+#' 
 citrus.buildModel.continuous <- function(features, labels, type, regularizationThresholds, 
     ...) {
     
@@ -35,7 +35,7 @@ citrus.buildModel.continuous <- function(features, labels, type, regularizationT
 
 #' @rdname citrus.thresholdCVs
 #' @name citrus.thresholdCVs
-#' @export
+#' 
 citrus.thresholdCVs.quick.continuous <- function(modelType, features, labels, regularizationThresholds, 
     nCVFolds = 10, ...) {
     
@@ -78,7 +78,7 @@ foldScore.continuous <- function(index, folds, predictions, labels) {
 
 #' @rdname citrus.predict
 #' @name citrus.predict
-#' @export
+#' 
 citrus.predict.continuous <- function(citrus.endpointModel, newFeatures) {
     if (citrus.endpointModel$type == "glmnet") {
         predictions <- predict(citrus.endpointModel$model, newx = newFeatures, type = "response")
@@ -91,7 +91,7 @@ citrus.predict.continuous <- function(citrus.endpointModel, newFeatures) {
 
 #' @rdname citrus.generateRegularizationThresholds
 #' @name citrus.generateRegularizationThresholds
-#' @export
+#' 
 citrus.generateRegularizationThresholds.continuous <- function(features, labels, 
     modelType, n = 100, ...) {
     addtlArgs <- list(...)

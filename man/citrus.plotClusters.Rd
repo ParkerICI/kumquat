@@ -4,25 +4,33 @@
 \alias{citrus.plotClusters}
 \title{Plot cluster histograms}
 \usage{
-citrus.plotClusters(clusterIds, clustersData, conditions = NULL,
-  outputDir = NULL)
+citrus.plotClusters(clusterIds, clustersData, colNames = names(clustersData),
+  byCluster = TRUE, outputDir = NULL, outputFile = NULL)
 }
 \arguments{
 \item{clusterIds}{Vector of cluster IDs to plot}
 
-\item{conditions}{Vector of conditions clustering was performed on.}
+\item{clustersData}{\code{data.frame} containing the clusters data. Each row is a cell
+and column represents the expression of different markers (non numeric columns are dropped). 
+The \code{data.frame} must contain a column called \code{cellType} which indicates the cluster assignments. 
+The values in \code{clusterIds} must match the values in \code{cellType}.}
 
-\item{clusterAssignments}{List containing indicies of cells assigned to each cluster.}
+\item{colNames}{Which columns of \code{clustersData} to include in the plot. The default is to include all
+columns in the plot}
 
-\item{citrus.combinedFCSSet}{Combined FCS data that was clustered.}
+\item{byCluster}{Whether to have a separate plot for each cluster (default), or a single plot with all the
+clusters. The latter option may take quite long to plot if there are several clusters}
 
-\item{clusteringColumns}{Columns for which to plot distributions}
+\item{outputDir}{The directory in which the plots will be written (only used if \code{byCluster == TRUE}).}
 
-\item{outputFile}{If not \code{NULL}, plot is written to \code{outputFile}.}
+\item{outputFile}{The output file the plot will be written to (only used if \code{byCluster == FALSE}). Note that
+this needs to be the full path to the file, as \code{outputDir} is ignored when \code{byCluster == FALSE}. If
+this parameter is \code{NULL} and \code{byCluster == FALSE} no file will be written 
+(and the plot will be returned invisibly)}
+}
+\value{
+Either \code{NULL} if \code{byCluster == TRUE} or a \code{ggplot2} plot object otherwise
 }
 \description{
 Plot expression of markers in cluster cells relative to all cells
-}
-\author{
-Robert Bruggner
 }

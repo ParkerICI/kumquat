@@ -122,11 +122,11 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
             nonzeroFeatureNames <- colnames(features)
         else
             nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
-        
+
         # Write features to file for easy parsing
         write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, 
             paste("features_", cvPoint, ".csv", sep = "")), quote = F)
-        
+     
         melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
             labels = labels, check.names = F), id.vars = "labels")
         
@@ -163,9 +163,8 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
         melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
             labels = labels, check.names = F), id.vars = "labels")
         
-        pdf(file.path(modelOutputDirectory, paste("features-", sub(pattern = "\\.", 
-            replacement = "_", x = cvPoint), ".pdf", sep = "")), width = 4, height = length(nonzeroFeatureNames) * 
-            1.5)
+        pdf(file.path(modelOutputDirectory, paste("features-", cvPoint, ".pdf", sep = "")), 
+            width = 4, height = length(nonzeroFeatureNames) * 1.5)
         p <- (ggplot2::ggplot(melted, ggplot2::aes(x = value, y = labels)) 
                 + ggplot2::facet_wrap(~variable, ncol = 1) 
                 + ggplot2::geom_point(size = I(2)) 

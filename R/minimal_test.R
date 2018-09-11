@@ -39,8 +39,11 @@ minimal_test2 <- function() {
     
     
     ff <- convert_to_citrus_featureset(kk)
-    sam.model <- get_model(ff, metadata.tab$tissue, "./", "sam")
-
+    #sam.model <- get_model(ff, metadata.tab$tissue, "sam")
+    #pam.model <- get_model(ff, metadata.tab$tissue, "pamr")
+    
+    sam.model <- run_analysis(ff, metadata.tab$tissue, "./", "sam")
+    pam.model <- run_analysis(ff, metadata.tab$tissue, "./", "pamr")
     
     
     ######################################

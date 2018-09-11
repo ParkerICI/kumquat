@@ -15,7 +15,7 @@ convert_to_citrus_featureset <- function(tab) {
 
 
 #' @export 
-get_model <- function(citrus.features, endpoint, working.directory, model.type) {
+get_model <- function(citrus.features, endpoint, model.type) {
     family <- NULL
     
     if (is.character(endpoint) || is.factor(endpoint)) {
@@ -24,22 +24,31 @@ get_model <- function(citrus.features, endpoint, working.directory, model.type) 
         
     } else family <- "continuous"
     
-    citrus.res <- citrus::citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
+    citrus.res <- citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
                                                  labels = endpoint, family = family)
     
+    citrus.res$allFeatures <- citrus.features$allFeatures
     return(citrus.res)
     
 }
 
-
+#' High level wrapper
 #' @export
-run_citrus_analysis <- function(citrus.features, endpoint, working.directory, model.type, plot.by.cluster = FALSE,
+run_analysis <- function(citrus.features, endpoint, output.directory, model.type, plot.by.cluster = FALSE,
                                 plot.all.features = FALSE, clusters.data = NULL) {
 
+    out.dir <- file.path(output.directory, sprintf("%s_results", model.type))
+    dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
+    message("Calculating model")
+    citrus.res <- get_model(citrus.features, endpoint, model.type)
     
-    citrus.res <- citrus::citrus.endpointRegress(citrus.features, endpoint, working.directory, model.type)
+    message("Plotting model error rate")
+    plot_error_rate(citrus.res, out.dir)
     
-    return(citrus.res)
+    message("Plotting stratifying features")
+    plot_stratifying_features(citrus.res, out.dir)
+    
+    return(invisible(citrus.res))
     
 }
 

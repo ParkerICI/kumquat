@@ -213,23 +213,29 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
     
 }
 
-citrus.overlapDensityPlot.old <- function(clusterDataList, backgroundData) {
-    combined <- data.frame(check.names = F, check.rows = F)
+citrus.overlapDensityPlot <- function(clusterDataList, backgroundData) {
 
-    for (clusterName in names(clusterDataList)) {
-        combined <- rbind(combined, cbind(reshape2::melt(clusterDataList[[clusterName]], varnames = c("row", 
-            "marker")), clusterId = clusterName, src = "Cluster"))
-    }
+    #browser()
+    combined <- lapply(names(clusterDataList), function(clusterName) {
+        ret <- reshape2::melt(clusterDataList[[clusterName]])
+        ret <- data.frame(ret, clusterId = clusterName, src = "Cluster", check.names = FALSE)
+        return(ret)
+    })
+    combined <- do.call(rbind, combined)
+    backgroundData <- reshape2::melt(backgroundData)
+    backgroundData <- data.frame(backgroundData, src = "Background")
+    
     p <- (ggplot2::ggplot(data = combined, ggplot2::aes(x = value, y = ..scaled.., fill = src)) 
             + ggplot2::geom_density() 
-            + ggplot2::facet_grid(clusterId ~ marker, scales = "free") 
-            + ggplot2::geom_density(data = cbind(reshape2::melt(backgroundData, varnames = c("row", "marker")), src = "Background")) 
+            + ggplot2::facet_grid(clusterId ~ variable, scales = "free") 
+            + ggplot2::geom_density(data = backgroundData) 
             + ggplot2::theme_bw() 
             + ggplot2::scale_fill_manual(values = c(Background = rgb(0.3, 0.3, 1, 0.2), Cluster = rgb(1, 0.3, 0.3, 0.5))) 
             + ggplot2::theme(legend.position = "bottom", axis.text.y = ggplot2::element_blank(), 
                 axis.ticks.y = ggplot2::element_blank(), axis.title = ggplot2::element_blank()) 
             + ggplot2::labs(fill = "Distribution:")
         )
+
     return(p)
 }
 
@@ -241,7 +247,7 @@ get_cluster_density_plots <- function(clusters.data, background.data) {
     tab$cellType <- NULL
     m <- reshape2::melt(tab, id.vars = "type")
     
-    p <- (ggplot2::ggplot(data = m, ggplot2::aes(x = value, fill = type)) 
+    p <- (ggplot2::ggplot(data = m, ggplot2::aes(x = value, fill = type, y = ..scaled..)) 
           + ggplot2::geom_density() 
           + ggplot2::facet_wrap(~ variable, scales = "free") 
           + ggplot2::theme_bw() 
@@ -284,12 +290,16 @@ citrus.plotClusters <- function(clusterIds, clustersData, conditions = NULL, out
     
     data <- clustersData
     
-    #clusterDataList <- list()
+    clusterDataList <- list()
     
     bgData <- data
     
     if (nrow(bgData) > 5000) 
         bgData <- bgData[sample(1:nrow(bgData), 5000), ]
+    
+    
+    print("FIXMEE")
+    clusterIds <- clusterIds[1:5]
     
     for (clusterId in sort(clusterIds)) {
         temp <- clustersData[clustersData$cellType == clusterId, ]
@@ -297,23 +307,24 @@ citrus.plotClusters <- function(clusterIds, clustersData, conditions = NULL, out
         if (nrow(temp) > 2500) 
             temp <- temp[sample(1:nrow(temp), 2500), ]
       
-        p <- get_cluster_density_plots(temp, bgData)
-        plotDim <- (ncol(data) / 4) + 1
+        #p <- get_cluster_density_plots(temp, bgData)
+        #plotDim <- (ncol(data) / 4) + 1
         
-        ggplot2::ggsave(file.path(outputDir, sprintf("c%d.pdf", clusterId)), plot = p, 
-                        width = plotDim, height = plotDim, limitsize = FALSE)
+        #ggplot2::ggsave(file.path(outputDir, sprintf("c%d.pdf", clusterId)), plot = p, 
+        #                width = plotDim, height = plotDim, limitsize = FALSE)
         
-        #clusterDataList[[as.character(clusterId)]] <- temp
+        clusterDataList[[as.character(clusterId)]] <- temp
     }
 
    #
-    #p <- citrus.overlapDensityPlot(clusterDataList = clusterDataList, backgroundData = bgData)
+    p <- citrus.overlapDensityPlot(clusterDataList = clusterDataList, backgroundData = bgData)
+    outputFile <- file.path(outputDir, "test.pdf")
     
-    ##if (!is.null(outputFile)) {
-    #    ggplot2::ggsave(p, outputFile, width = (2.2 * ncol(data) + 2), height = (2* length(clusterIds)))
-    #    return(invisible(NULL))
-    #} else 
-    #    return(p)
+    if (!is.null(outputFile)) {
+        ggplot2::ggsave(outputFile, p, width = (2.2 * ncol(data) + 2), height = (2* length(clusterIds)), limitsize = FALSE)
+        return(invisible(NULL))
+    } else 
+        return(p)
     
 }
 

@@ -5,7 +5,7 @@
 \title{Plot cluster histograms}
 \usage{
 citrus.plotClusters(clusterIds, clustersData, colNames = names(clustersData),
-  byCluster = TRUE, outputDir = NULL, outputFile = NULL)
+  byCluster = FALSE, outputDir = NULL, outputFile = NULL)
 }
 \arguments{
 \item{clusterIds}{Vector of cluster IDs to plot}
@@ -18,8 +18,9 @@ The values in \code{clusterIds} must match the values in \code{cellType}.}
 \item{colNames}{Which columns of \code{clustersData} to include in the plot. The default is to include all
 columns in the plot}
 
-\item{byCluster}{Whether to have a separate plot for each cluster (default), or a single plot with all the
-clusters. The latter option may take quite long to plot if there are several clusters}
+\item{byCluster}{If this is \code{TRUE} this function will generate a separate plot 
+for each cluster, otherwise or a single plot with all the clusters. 
+The latter option may take quite long to plot if there are several clusters}
 
 \item{outputDir}{The directory in which the plots will be written (only used if \code{byCluster == TRUE}).}
 

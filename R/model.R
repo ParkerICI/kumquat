@@ -13,7 +13,19 @@ convert_to_citrus_featureset <- function(tab) {
     return(ret)
 }
 
-
+#' Calculate a prediction model
+#' 
+#' This function is the main wrapper around the Citrus model building functionality
+#' 
+#' @param endpoint A vector of length equal to \code{nrow(features)} containing 
+#'   the values to be used as prediction endpoints. If this vertor is numeric
+#'   a model of family \code{"continuous"} is generated, otherwise if it is
+#'   a character or factor vector the model will be of family 
+#'   \code{"classification"}
+#' @param model.type The type of model, either \code{"pamr"}, \code{"sam"} or
+#'   \code{"glmnet"}
+#' @inherit citrus.endpointRegress return
+#' 
 #' @export 
 get_model <- function(citrus.features, endpoint, model.type) {
     family <- NULL
@@ -46,7 +58,7 @@ run_analysis <- function(citrus.features, endpoint, output.directory, model.type
     plot_error_rate(citrus.res, out.dir)
     
     message("Plotting stratifying features")
-    plot_stratifying_features(citrus.res, out.dir)
+    plot_stratifying_features(citrus.res, file.path(out.dir, "model_error_rate.pdf"))
     
     return(invisible(citrus.res))
     

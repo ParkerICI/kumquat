@@ -1,5 +1,5 @@
 minimal_test <- function() {
-    library(citrus)
+    library(kumquat)
     setwd("C:/Users/fgherardini/temp/standalone_citrus/data")
     tab <- read.table("Patient20_diseased_unstim.fcs.clustered.txt", header = T, 
         sep = "\t", stringsAsFactors = F, check.names = F)
@@ -23,7 +23,7 @@ minimal_test <- function() {
 }
 
 minimal_test2 <- function() {
-    library(citrus)
+    library(kumquat)
     setwd("C:/Users/fgherardini/temp/standalone_citrus/science")
     tab <- read.table("all.pooled.clustered.txt", header = T, 
                       sep = "\t", stringsAsFactors = F, check.names = F)

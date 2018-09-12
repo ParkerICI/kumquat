@@ -1,7 +1,7 @@
 #' Build an endpoint model 
 #' 
 #' This function constructs an endpoint model using features calculated by citrus. 
-#' @name citrus.buildEndpointModel
+#'
 #' @param features A numeric matrix of predictive features. Rows are observations and column entries are features. 
 #' @param labels A vector of endpoint values (i.e. class labels) for each row of the feature matrix. 
 #' @param family Family of endpoint model to be constructed. Valid values are \code{classification} and \code{continuous}. 
@@ -16,7 +16,7 @@
 #' \item{type}{Model type.}
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.buildEndpointModel <- function(features, labels, family = "classification", 
     type = "pamr", regularizationThresholds = NULL, ...) {
     if (is.null(regularizationThresholds)) {
@@ -32,8 +32,7 @@ citrus.buildEndpointModel <- function(features, labels, family = "classification
     return(result)
 }
 
-#' @export
-#' @name citrus.buildEndpointModel
+
 print.citrus.endpointModel <- function(citrus.endpointModel, ...) {
     cat("Citrus Model\n")
     cat(paste("\tFamily:", citrus.endpointModel$family, "\n"))
@@ -53,7 +52,7 @@ print.citrus.endpointModel <- function(citrus.endpointModel, ...) {
 #' @return A vector of regularization threshold values.
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.generateRegularizationThresholds <- function(features, labels, modelType, 
     family, n = 100, ...) {
     do.call(paste0("citrus.generateRegularizationThresholds.", family), args = list(features = features, 
@@ -84,7 +83,7 @@ citrus.generateRegularizationThresholds <- function(features, labels, modelType,
 #' supplied regularization thresholds.
 #' 
 #' @author Robert Bruggner
-#' @export 
+#'  
 citrus.thresholdCVs <- function(modelType, foldFeatures, labels, regularizationThresholds, 
     family, folds, foldModels, leftoutFeatures, ...) {
     if (modelType == "sam") {
@@ -109,7 +108,7 @@ citrus.thresholdCVs <- function(modelType, foldFeatures, labels, regularizationT
 
 
 #' @rdname citrus.thresholdCVs
-#' @export 
+#'  
 citrus.thresholdCVs.quick <- function(modelType, features, labels, regularizationThresholds, 
     family, nCVFolds = 10, ...) {
     if (modelType == "sam") {
@@ -129,7 +128,7 @@ citrus.thresholdCVs.quick <- function(modelType, features, labels, regularizatio
 #' @return Matrix of predicted sample endpoints at all model regularization thresholds.
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.predict <- function(citrus.endpointModel, newFeatures) {
     do.call(paste0("citrus.predict.", citrus.endpointModel$family), args = list(citrus.endpointModel = citrus.endpointModel, 
         newFeatures = newFeatures))
@@ -149,7 +148,7 @@ citrus.predict <- function(citrus.endpointModel, newFeatures) {
 #' @return A list of models, one model fit on each fold's feature set. 
 #' 
 #' @author Robert Bruggner
-#' @export
+#'
 citrus.buildFoldsEndpointModels <- function(type, citrus.foldFeatureSet, labels, 
     regularizationThresholds = NULL, family = "classification", ...) {
     
@@ -194,7 +193,7 @@ citrus.buildFoldEndpointModel <- function(foldIndex, folds, foldFeatures, labels
 #' of how regularization thresholds are selected, the final reported features are from the final model constructed from all features, constrained by 
 #' identified optimal regularization thresholds.
 #' 
-#' @return A \code{citrus.regression} object with the following properties:
+#' @return A \code{citrus.regressionResult} object with the following properties:
 #' \item{regularizationThresholds}{Regularization thresholds used to constrain all constructed models. Not applicable for \code{sam} models.}
 #' \item{foldModels}{A \code{citrus.endpointModel} constructed from each independent fold feature set. \code{NULL} if \code{nFolds = 1}.}
 #' \item{finalModel}{A \code{citrus.endpointModel} constructed from features derived from the clustering of all samples together.}
@@ -206,7 +205,7 @@ citrus.buildFoldEndpointModel <- function(foldIndex, folds, foldFeatures, labels
 #' \item{labels}{Endpoint labels of analyzed samples.}
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.endpointRegress <- function(modelType, citrus.foldFeatureSet, labels, family, 
     ...) {
     
@@ -283,7 +282,7 @@ citrus.endpointRegress <- function(modelType, citrus.foldFeatureSet, labels, fam
 #' when possible.
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.getCVMinima <- function(modelType, thresholdCVRates, fdrRate = 0.01) {
     cvPoints <- list()
     if (modelType == "sam") {
@@ -326,7 +325,7 @@ citrus.getCVMinima <- function(modelType, thresholdCVRates, fdrRate = 0.01) {
 #' @return List of significant features and clusters at specified thresholds.
 #' 
 #' @author Robert Bruggner
-#' @export
+#' 
 citrus.extractModelFeatures <- function(cvMinima, finalModel, finalFeatures) {
     res <- list()
     modelType <- finalModel$type

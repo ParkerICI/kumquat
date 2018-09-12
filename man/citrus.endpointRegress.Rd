@@ -18,7 +18,7 @@ citrus.endpointRegress(modelType, citrus.foldFeatureSet, labels, family, ...)
 \item{...}{Other parameters passed to model-fitting methods.}
 }
 \value{
-A \code{citrus.regression} object with the following properties:
+A \code{citrus.regressionResult} object with the following properties:
 \item{regularizationThresholds}{Regularization thresholds used to constrain all constructed models. Not applicable for \code{sam} models.}
 \item{foldModels}{A \code{citrus.endpointModel} constructed from each independent fold feature set. \code{NULL} if \code{nFolds = 1}.}
 \item{finalModel}{A \code{citrus.endpointModel} constructed from features derived from the clustering of all samples together.}

@@ -7,8 +7,6 @@
 \alias{citrus.buildEndpointModel}
 \alias{citrus.buildModel.continuous}
 \alias{citrus.buildEndpointModel}
-\alias{citrus.buildEndpointModel}
-\alias{print.citrus.endpointModel}
 \title{Build an endpoint model}
 \usage{
 citrus.buildModel.classification(features, labels, type,
@@ -19,8 +17,6 @@ citrus.buildModel.continuous(features, labels, type, regularizationThresholds,
 
 citrus.buildEndpointModel(features, labels, family = "classification",
   type = "pamr", regularizationThresholds = NULL, ...)
-
-\method{print}{citrus.endpointModel}(citrus.endpointModel, ...)
 }
 \arguments{
 \item{features}{A numeric matrix of predictive features. Rows are observations and column entries are features.}

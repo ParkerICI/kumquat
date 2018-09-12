@@ -1,12 +1,12 @@
 
-citrus.plotTypeErrorRate <- function(modelType, modelOutputDirectory, regularizationThresholds, 
+citrus.plotTypeErrorRate <- function(modelType, outputFile, regularizationThresholds, 
     thresholdCVRates, finalModel, cvMinima, family) {
     if (modelType == "sam") {
         message("Error rate plots are not available for sam models")
         return(invisible(NULL))
     }
     
-    pdf(file.path(modelOutputDirectory, "ModelErrorRate.pdf"), width = 6, height = 6)
+    pdf(outputFile, width = 6, height = 6)
     thresholds <- regularizationThresholds
     errorRates <- thresholdCVRates[, "cvm"]
     ylim <- c(0, 1)
@@ -232,8 +232,9 @@ citrus.clusterDensityPlots <- function(clustersData, backgroundData) {
 #'   The values in \code{clusterIds} must match the values in \code{cellType}.  
 #' @param colNames Which columns of \code{clustersData} to include in the plot. The default is to include all
 #'   columns in the plot
-#' @param byCluster Whether to have a separate plot for each cluster (default), or a single plot with all the
-#'   clusters. The latter option may take quite long to plot if there are several clusters
+#' @param byCluster If this is \code{TRUE} this function will generate a separate plot 
+#'   for each cluster, otherwise or a single plot with all the clusters. 
+#'   The latter option may take quite long to plot if there are several clusters
 #' @param outputDir The directory in which the plots will be written (only used if \code{byCluster == TRUE}).
 #' @param outputFile The output file the plot will be written to (only used if \code{byCluster == FALSE}). Note that
 #'   this needs to be the full path to the file, as \code{outputDir} is ignored when \code{byCluster == FALSE}. If
@@ -243,7 +244,7 @@ citrus.clusterDensityPlots <- function(clustersData, backgroundData) {
 #' @return Either \code{NULL} if \code{byCluster == TRUE} or a \code{ggplot2} plot object otherwise
 #' 
 citrus.plotClusters <- function(clusterIds, clustersData, colNames = names(clustersData), 
-                                byCluster = TRUE, outputDir = NULL, outputFile = NULL) {
+                                byCluster = FALSE, outputDir = NULL, outputFile = NULL) {
     data <- clustersData[, colNames]
     data <- data[, sapply(data, is.numeric)]
     data$cellType <- clustersData$cellType
@@ -287,63 +288,7 @@ citrus.plotClusters <- function(clusterIds, clustersData, colNames = names(clust
     
 }
 
-#' Plot results of a Citrus regression analysis
-#' 
-#' Makes many plots showing results of a Citrus analysis
-#' 
-#' @name plot.citrus.regressionResult
-#' 
-#' 
-#' @param citrus.regressionResult A \code{citrus.regressionResult} object.
-#' @param outputDirectory Full path to output directory for plots.
-#' @param citrus.foldClustering A \code{citrus.foldClustering} object.
-#' @param citrus.foldFeatureSet A \code{citrus.foldFeatureSet} object. 
-#' @param citrus.combinedFCSSet A \code{citrus.combinedFCSSet} object.
-#' @param plotTypes Vector of plots types to make. Valid options are \code{errorRate} (Cross-validated error rates for predictive models),
-#' \code{stratifyingFeatures} (plots of non-zero model features),\code{stratifyingClusters} (plots of clustering marker distributions in stratifying clusters)
-#' @author Robert Bruggner
-#' 
-plot.citrus.regressionResult <- function(citrus.regressionResult, outputDirectory, 
-    citrus.foldClustering, citrus.foldFeatureSet, citrus.combinedFCSSet, plotTypes = c("errorRate", 
-        "stratifyingFeatures", "stratifyingClusters"), byCluster = FALSE, allFeatures = FALSE, clustersData = NULL, ...) {
-    addtlArgs <- list(...)
-    
-    theme <- "black"
-    if ("theme" %in% names(addtlArgs)) {
-        theme <- addtlArgs[["theme"]]
-    }
-    
-    modelType <- citrus.regressionResult$modelType
-    
-    cat(paste("Plotting results for", modelType, "\n"))
-    
-    # Make model output directoy
-    modelOutputDirectory <- file.path(outputDirectory, paste0(modelType, "_results"))
-    dir.create(modelOutputDirectory, showWarnings = F, recursive = T)
-    
-    if ("errorRate" %in% plotTypes) {
-        cat("Plotting Error Rate\n")
-        citrus.plotTypeErrorRate(modelType = modelType, modelOutputDirectory = modelOutputDirectory, 
-            regularizationThresholds = citrus.regressionResult$regularizationThresholds, 
-            thresholdCVRates = citrus.regressionResult$thresholdCVRates, finalModel = citrus.regressionResult$finalModel$model, 
-            cvMinima = citrus.regressionResult$cvMinima, family = citrus.regressionResult$family)
-    }
-    
-    if ("stratifyingFeatures" %in% plotTypes) {
-        cat("Plotting Stratifying Features\n")
-        do.call(paste("citrus.plotModelDifferentialFeatures", citrus.regressionResult$family, 
-            sep = "."), args = list(differentialFeatures = citrus.regressionResult$differentialFeatures, 
-            features = citrus.foldFeatureSet$allFeatures, modelOutputDirectory = modelOutputDirectory, 
-            labels = citrus.regressionResult$labels, byCluster = byCluster, allFeatures = allFeatures))
-    }
-    
-    if ("stratifyingClusters" %in% plotTypes) {
-        cat("Plotting Stratifying Clusters\n")
-        citrus.plotModelClusters(differentialFeatures = citrus.regressionResult$differentialFeatures, 
-            modelOutputDirectory = modelOutputDirectory, clustersData = clustersData)
-    }
-    
-}
+
 
 #' Plot a citrus.full.result
 #' @name plot.citrus.full.result

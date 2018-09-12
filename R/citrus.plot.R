@@ -113,6 +113,7 @@ getFeaturesPlot.classification <- function(melted) {
 
 citrus.plotModelDifferentialFeatures.classification <- function(differentialFeatures, 
     features, modelOutputDirectory, labels, byCluster = FALSE, allFeatures = FALSE) {
+    
     cvPoints <- names(differentialFeatures)
     if(allFeatures)
         cvPoints <- c(cvPoints, "allFeatures")
@@ -122,9 +123,11 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
             nonzeroFeatureNames <- colnames(features)
         else
             nonzeroFeatureNames <- differentialFeatures[[cvPoint]][["features"]]
+        outDir <- file.path(modelOutputDirectory, cvPoint, "features")
+        dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
 
         # Write features to file for easy parsing
-        write.csv(features[, nonzeroFeatureNames], file = file.path(modelOutputDirectory, 
+        write.csv(features[, nonzeroFeatureNames], file = file.path(outDir, 
             paste("features_", cvPoint, ".csv", sep = "")), quote = F)
      
         melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
@@ -132,11 +135,13 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
         
         melted$cluster <- sapply(strsplit(as.character(melted$variable), "_"), "[", 2)
         
-        cvPoint <- sub(pattern = "\\.", replacement = "_", x = cvPoint)
+        p <- getFeaturesPlot.classification(melted)
         
+        ggplot2::ggsave(file.path(outDir, paste("features_", cvPoint, ".pdf", sep = "")), 
+                        plot = p, width = 4, height = length(nonzeroFeatureNames) * 1.5, limitsize = FALSE)
         
         if(byCluster) {
-            outDir <- file.path(modelOutputDirectory, cvPoint)
+            outDir <- file.path(modelOutputDirectory, cvPoint, "clusters")
             dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
             plyr::d_ply(melted, ~cluster, function(x) {
                 p <- getFeaturesPlot.classification(x)
@@ -144,13 +149,12 @@ citrus.plotModelDifferentialFeatures.classification <- function(differentialFeat
             })
         }
         
-        p <- getFeaturesPlot.classification(melted)
-        
-        ggplot2::ggsave(file.path(modelOutputDirectory, paste("features-", cvPoint, ".pdf", sep = "")), 
-                        plot = p, width = 4, height = length(nonzeroFeatureNames) * 1.5, limitsize = FALSE)
+
     }
 }
 
+
+# This one still needs refactoring
 citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures, 
     features, modelOutputDirectory, labels, ...) {
     for (cvPoint in names(differentialFeatures)) {
@@ -163,7 +167,7 @@ citrus.plotModelDifferentialFeatures.continuous <- function(differentialFeatures
         melted <- reshape2::melt(data.frame(features[, nonzeroFeatureNames, drop = F], 
             labels = labels, check.names = F), id.vars = "labels")
         
-        pdf(file.path(modelOutputDirectory, paste("features-", cvPoint, ".pdf", sep = "")), 
+        pdf(file.path(modelOutputDirectory, paste("features_", cvPoint, ".pdf", sep = "")), 
             width = 4, height = length(nonzeroFeatureNames) * 1.5)
         p <- (ggplot2::ggplot(melted, ggplot2::aes(x = value, y = labels)) 
                 + ggplot2::facet_wrap(~variable, ncol = 1) 

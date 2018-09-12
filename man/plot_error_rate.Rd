@@ -10,7 +10,7 @@ plot_error_rate(citrus.model, output.file)
 \item{citrus.model}{An object of class \code{citrus.regressionResult}, as returned from
 \code{\link{get_model}}}
 
-\item{output.dir}{The output file path}
+\item{output.file}{The path of the output file the plot will be written to}
 }
 \value{
 Returns \code{NULL}

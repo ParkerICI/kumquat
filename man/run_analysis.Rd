@@ -5,9 +5,11 @@
 \title{High level wrapper}
 \usage{
 run_analysis(citrus.features, endpoint, output.directory, model.type,
-  plot.by.cluster = FALSE, plot.all.features = FALSE,
   clusters.data = NULL)
 }
 \description{
-High level wrapper
+This function is a high-level wrapper around the whole model building pipeline. It will calculate a model
+and write a series of standardized plots. If you want more control over the plotting output, please
+run \code{\link{get_model}} to calculate the model, and the individual plotting functions
+(\code{\link{plot_error_rate}}, \code{\link{plot_stratifying_features}}, \code{\link{plot_stratifying_clusters}})
 }

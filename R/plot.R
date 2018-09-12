@@ -6,6 +6,8 @@
 #'   and column represents the expression of different markers (non numeric columns are dropped)
 #' @param col.names Which columns of \code{clustersData} to include in the plot. The default is to include all
 #'   columns in the plot
+#' @param output.dir The directory that will contain the output. Additional directories and 
+#'   sub-directories will be created in \code{output.dir}
 #' @param by.cluster If this is \code{TRUE} this function will generate a separate plot 
 #'   for each cluster, otherwise or a single plot with all the clusters. 
 #'   The latter option may take quite long to plot if there are several clusters   
@@ -16,7 +18,7 @@ plot_stratifying_clusters <- function(citrus.model, clusters.data, output.dir, c
 
     for (cv.point in names(differential.features)) {
         cluster.ids <- as.numeric(differential.features[[cv.point]][["clusters"]])
-        out.dir <- file.path(output.dir, cv.point)
+        out.dir <- file.path(output.dir, cv.point, "clusters")
         dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
         
         output.file <- NULL
@@ -31,7 +33,7 @@ plot_stratifying_clusters <- function(citrus.model, clusters.data, output.dir, c
 #' 
 #' @param citrus.model An object of class \code{citrus.regressionResult}, as returned from
 #'   \code{\link{get_model}}
-#' @param output.dir The output file path
+#' @param output.file The path of the output file the plot will be written to
 #' @return Returns \code{NULL}
 #' @export
 plot_error_rate <- function(citrus.model, output.file) {
@@ -43,6 +45,10 @@ plot_error_rate <- function(citrus.model, output.file) {
     return(invisible(NULL))
 }
 
+
+#' Plot stratifying features
+#' @inheritParams plot_stratifying_clusters
+#' @param all.features Wether to plot only the stratifying features (default) or all the features
 #' @export
 plot_stratifying_features <- function(citrus.model, output.dir, by.cluster = FALSE, all.features = FALSE) {
     do.call(paste("citrus.plotModelDifferentialFeatures", citrus.model$family, 

@@ -44,6 +44,7 @@ minimal_test2 <- function() {
     
     sam.model <- run_analysis(ff, metadata.tab$tissue, "./", "sam")
     pam.model <- run_analysis(ff, metadata.tab$tissue, "./", "pamr")
+    plot_stratifying_features(pam.model, "pamr_results", by.cluster = TRUE, all.features = TRUE)
     
     
     ######################################

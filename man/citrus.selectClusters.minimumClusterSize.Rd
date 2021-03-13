@@ -4,8 +4,11 @@
 \alias{citrus.selectClusters.minimumClusterSize}
 \title{Selects clusters for endpoint analysis}
 \usage{
-citrus.selectClusters.minimumClusterSize(citrus.clustering,
-  minimumClusterSizePercent = 0.05, ...)
+citrus.selectClusters.minimumClusterSize(
+  citrus.clustering,
+  minimumClusterSizePercent = 0.05,
+  ...
+)
 }
 \arguments{
 \item{citrus.clustering}{A \code{citrus.clustering} object.}

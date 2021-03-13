@@ -9,4 +9,4 @@ Description: Automated identification of clusters whose behavior differs
 License: GPL-3
 Imports:
     pamr,glmnet,samr,ggplot2,flowCore,survival,parallel,reshape2,plyr
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1

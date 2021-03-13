@@ -4,8 +4,13 @@
 \alias{run_analysis}
 \title{High level wrapper}
 \usage{
-run_analysis(citrus.features, endpoint, output.directory, model.type,
-  clusters.data = NULL)
+run_analysis(
+  citrus.features,
+  endpoint,
+  output.directory,
+  model.type,
+  clusters.data = NULL
+)
 }
 \description{
 This function is a high-level wrapper around the whole model building pipeline. It will calculate a model

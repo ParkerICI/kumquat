@@ -1,3 +1,45 @@
+minimal_test3 <- function() {
+    library(kumquat)
+    setwd("C:/Users/pfgherardini/temp/standalone_citrus")
+    
+    tab <- read.table("out_pooled_downsample_40000/group1.clustered.txt", header = T,
+                      sep = "\t", stringsAsFactors = F, check.names = F)
+    
+    metadata.tab <- readRDS("metadata_with_filename.rds")
+    metadata.tab$sample.id <- gsub(".clustered.txt", "", metadata.tab$filename)
+    metadata.tab <- metadata.tab[!metadata.tab$timepoint.id %in% c("BL", "EOT"), ]
+    metadata.tab <- metadata.tab[metadata.tab$timepoint.id %in% c("C1D1", "C1D5"), ]
+    
+    
+    features.names <- c("popsize")
+    
+    features <- grappolo::melt_cluster_results(tab, features.names)
+    
+    #features.normalized <- multistep_normalize(features, list(timepoint.id = "C1D1"), subject.var = "subject.id")
+    
+
+    
+    features.citrus <- get_cluster_features(
+      features, 
+      metadata.tab = metadata.tab,
+      sample.col = "sample.id",
+      predictors = "timepoint.id",
+      endpoint.grouping = "subject.id"
+    )
+    
+    ff <- convert_to_citrus_featureset(features.citrus)
+    
+    endpoint <- metadata.tab[!duplicated(metadata.tab$subject.id), ]
+    row.names(endpoint) <- endpoint$subject.id
+    
+    sam.model <- run_analysis(ff, endpoint$psa.response, "./", "pamr")
+    
+    
+}
+
+
+
+
 minimal_test <- function() {
     library(kumquat)
     setwd("C:/Users/fgherardini/temp/standalone_citrus/data")

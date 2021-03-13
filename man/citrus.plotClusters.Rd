@@ -4,8 +4,14 @@
 \alias{citrus.plotClusters}
 \title{Plot cluster histograms}
 \usage{
-citrus.plotClusters(clusterIds, clustersData, colNames = names(clustersData),
-  byCluster = FALSE, outputDir = NULL, outputFile = NULL)
+citrus.plotClusters(
+  clusterIds,
+  clustersData,
+  colNames = names(clustersData),
+  byCluster = FALSE,
+  outputDir = NULL,
+  outputFile = NULL
+)
 }
 \arguments{
 \item{clusterIds}{Vector of cluster IDs to plot}

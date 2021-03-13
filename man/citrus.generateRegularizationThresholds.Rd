@@ -4,19 +4,33 @@
 \name{citrus.generateRegularizationThresholds}
 \alias{citrus.generateRegularizationThresholds}
 \alias{citrus.generateRegularizationThresholds.classification}
-\alias{citrus.generateRegularizationThresholds}
 \alias{citrus.generateRegularizationThresholds.continuous}
-\alias{citrus.generateRegularizationThresholds}
 \title{Generate model regularization thresholds}
 \usage{
-citrus.generateRegularizationThresholds.classification(features, labels,
-  modelType, n = 100, ...)
+citrus.generateRegularizationThresholds.classification(
+  features,
+  labels,
+  modelType,
+  n = 100,
+  ...
+)
 
-citrus.generateRegularizationThresholds.continuous(features, labels, modelType,
-  n = 100, ...)
+citrus.generateRegularizationThresholds.continuous(
+  features,
+  labels,
+  modelType,
+  n = 100,
+  ...
+)
 
-citrus.generateRegularizationThresholds(features, labels, modelType, family,
-  n = 100, ...)
+citrus.generateRegularizationThresholds(
+  features,
+  labels,
+  modelType,
+  family,
+  n = 100,
+  ...
+)
 }
 \arguments{
 \item{features}{Features used to construct model}

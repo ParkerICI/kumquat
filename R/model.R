@@ -1,6 +1,6 @@
 #' @export
 convert_to_citrus_featureset <- function(tab) {
-    endpoint.grouping <- grep("cluster_", names(tab), invert = TRUE, value = TRUE)
+    endpoint.grouping <- grep("^cluster", names(tab), invert = TRUE, value = TRUE)
     
     rnames <- do.call(paste, list(tab[, endpoint.grouping], sep = "_"))
     cnames <- setdiff(colnames(tab), endpoint.grouping)

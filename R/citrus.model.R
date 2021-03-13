@@ -328,6 +328,7 @@ citrus.getCVMinima <- function(modelType, thresholdCVRates, fdrRate = 0.01) {
 #' 
 citrus.extractModelFeatures <- function(cvMinima, finalModel, finalFeatures) {
     res <- list()
+
     modelType <- finalModel$type
     finalModel <- finalModel$model
     for (cvPoint in names(cvMinima)[!grepl("index", names(cvMinima))]) {

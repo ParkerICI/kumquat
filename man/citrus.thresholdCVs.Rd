@@ -4,23 +4,49 @@
 \name{citrus.thresholdCVs}
 \alias{citrus.thresholdCVs}
 \alias{citrus.thresholdCVs.quick.classification}
-\alias{citrus.thresholdCVs}
 \alias{citrus.thresholdCVs.quick.continuous}
-\alias{citrus.thresholdCVs}
 \alias{citrus.thresholdCVs.quick}
 \title{Calculate model error rates}
 \usage{
-citrus.thresholdCVs.quick.classification(modelType, features, labels,
-  regularizationThresholds, nCVFolds = 10, ...)
+citrus.thresholdCVs.quick.classification(
+  modelType,
+  features,
+  labels,
+  regularizationThresholds,
+  nCVFolds = 10,
+  ...
+)
 
-citrus.thresholdCVs.quick.continuous(modelType, features, labels,
-  regularizationThresholds, nCVFolds = 10, ...)
+citrus.thresholdCVs.quick.continuous(
+  modelType,
+  features,
+  labels,
+  regularizationThresholds,
+  nCVFolds = 10,
+  ...
+)
 
-citrus.thresholdCVs(modelType, foldFeatures, labels, regularizationThresholds,
-  family, folds, foldModels, leftoutFeatures, ...)
+citrus.thresholdCVs(
+  modelType,
+  foldFeatures,
+  labels,
+  regularizationThresholds,
+  family,
+  folds,
+  foldModels,
+  leftoutFeatures,
+  ...
+)
 
-citrus.thresholdCVs.quick(modelType, features, labels, regularizationThresholds,
-  family, nCVFolds = 10, ...)
+citrus.thresholdCVs.quick(
+  modelType,
+  features,
+  labels,
+  regularizationThresholds,
+  family,
+  nCVFolds = 10,
+  ...
+)
 }
 \arguments{
 \item{modelType}{Type of model to be constructed. Valid options are: \code{pamr} and \code{glmnet}.}

@@ -6,54 +6,50 @@
 \usage{
 get_cluster_features(
   tab,
-  features.names,
   predictors = NULL,
   metadata.tab = NULL,
+  variable.col = "variable",
+  value.col = "value",
   endpoint.grouping = NULL,
-  sample.col = "sample.id",
-  transform.popsize = TRUE
+  sample.col = "sample.id"
 )
 }
 \arguments{
-\item{tab}{A \code{data.frame} representing clustering results, as produced by \code{cluster_data} (see Details)}
+\item{tab}{A \code{data.frame} of data in "molten" format (see Details)}
 
-\item{features.names}{The name of the features in \code{tab} that are to be included in the output. These names correspond to the portion before the \code{@}
-in \code{names(tab)}}
+\item{predictors}{Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify predictors. 
+The data will be processed using \code{reshape2::dcast}
+according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}}
 
-\item{predictors}{Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify predictors.}
+\item{metadata.tab}{Optional. A \code{data.frame} containing sample-level metadata to be merged with \code{tab} (see Details)}
 
-\item{metadata.tab}{A \code{data.frame} containing sample metadata (see Details)}
-
-\item{endpoint.grouping}{Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
-(see Details). The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}.
+\item{endpoint.grouping}{Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify the grouping of the endpoint
+(see Details). The data will be processed using \code{reshape2::dcast}
+according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every value in \code{tab}
 The function will throw an error if this is not the case.}
 
-\item{out.format}{The format of the return value, see below for detail}
-
-\item{filename.col}{The name of the column in \code{metadata.tab} that is used to identify the file names in tab}
+\item{sample.col}{Optional, only used if \code{metadata.tab} is provided. The name of the column that will be used to 
+merge \code{tab} with \code{metadata.tab}}
 }
 \value{
-Returns a data frame whose format depends on the value of the \code{out.format} parameter
-  \itemize{
-    \item{table}: each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
-    cluster features, which are combinations of the levels of the \code{predictors} for each feature specified in \code{features.names}
-    \item{tidy}: there is a single numeric column, and all the other columns represent variables whose combinations uniquely identify each observation (i.e. each row)
-  }
+Returns a matrix where each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
+      numeric features corresponding to combinations of the levels of the \code{predictors}
 }
 \description{
-This function takes a clustering result and a table of sample metadata, and calculates cluster features to be used for model building
+This function takes input data and (optionally) a table of sample metadata, and rearranges data into a matrix of features to be used for model building
 }
 \details{
-This function is designed to work with the results of \code{grappolo::cluster_fcs_files_groups}. These results contain sample-level values for size of the clusters
-and marker intensities. A column such as \code{foo@sample1} identifies the \code{sample1}-specific value of variable \code{foo} for each cluster. The
-\code{metadata.tab} must contain a column (identified by the \code{filename.col} function argument), which matches the names of the samples in
+The input table needs to be in molten format (i.e. see \code{reshape2::melt}) with \code{variable.col} and
+\code{value.col} columns identifying variables and their values (for instance cell population abundances). The
+\code{metadata.tab}, if provided, must contain a column (identified by the \code{sample.col} function argument), which matches the names of the samples in
 \code{tab} (i.e. the part after the \code{@}, "sample1" in the above example). The rest of the columns in \code{metadata.tab} represent file-level
 metadata, which is used to identify the data corresponding to a given combination of predictors (see below)
 An example will help clarify the working of this function. Suppose you have collected data from multiple patients at multiple timepoints and under multiple
 stimulation conditions.
 In this case the \code{metadata.tab} would look like this
 \itemize{
-  \item{\code{file}}{ The names of the data files that contain data for each sample. These must match the names in the clustering results (see above)}
+  \item{\code{sample.id}}{ This is used to merge sample metadata with the input data (see above)}
   \item{\code{timepoint}}{ The timepoint information}
   \item{\code{condition}}{ The stimulation condition}
   \item{\code{subject}}{ The subjet each file was derived from}
@@ -67,4 +63,7 @@ Let's assume a few different scenarios.
         the function with \code{predictors = c("condition")} and \code{endpoint.grouping = c("sample", "timepoint")}. The features in the resulting output
         would look like \code{cluster_1_feature1_condition}
 }
+Internally this function uses \code{reshape2::dcast} to structure the data in the appropriate format with the following formula (see the \code{reshape2::dcast}
+documentation for details on how the formula is interpreted): 
+\code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
 }

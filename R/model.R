@@ -1,17 +1,7 @@
-#' @export
-convert_to_citrus_featureset <- function(tab) {
-    endpoint.grouping <- grep("^cluster", names(tab), invert = TRUE, value = TRUE)
-    
-    rnames <- do.call(paste, list(tab[, endpoint.grouping], sep = "_"))
-    cnames <- setdiff(colnames(tab), endpoint.grouping)
-    ret <- as.matrix(tab[, cnames])
-    row.names(ret) <- rnames
-    colnames(ret) <- cnames
-    
-    return(list(allFeatures = ret, nFolds = 1))
-    
-    return(ret)
-}
+# @export
+#convert_to_citrus_featureset <- function(tab) {
+#    return(list(allFeatures = ret, nFolds = 1))
+#}
 
 #' Calculate a prediction model
 #' 
@@ -27,7 +17,9 @@ convert_to_citrus_featureset <- function(tab) {
 #' @inherit citrus.endpointRegress return
 #' 
 #' @export 
-get_model <- function(citrus.features, endpoint, model.type) {
+get_model <- function(features, endpoint, model.type) {
+    citrus.features <- list(allFeatures = features, nFolds = 1)
+    
     family <- NULL
     
     if (is.character(endpoint) || is.factor(endpoint)) {

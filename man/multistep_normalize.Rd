@@ -4,12 +4,18 @@
 \alias{multistep_normalize}
 \title{Normalize numeric data in multiple steps}
 \usage{
-multistep_normalize(tab, norm.template, subject.var)
+multistep_normalize(
+  tab,
+  norm.template,
+  subject.col,
+  variable.col = "variable",
+  value.col = "value"
+)
 }
 \arguments{
 \item{tab}{The input \code{data.frame} See the details for assumption about its structure}
 
-\item{norm.template}{A named list idenfying which categorical variables should be used to group data for normalization. The values in the list
+\item{norm.template}{A named list identyfying which categorical variables should be used to group data for normalization. The values in the list
 represent the value of the corresponding variable that identify the rows that are used as reference for normalization at each step. The data will be normalized
 in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)}
 
@@ -18,23 +24,16 @@ identified by this variable (i.e. data will never be normalized across subsets i
 }
 \description{
 This function normalizes numeric data in a table in multiple steps, based on groups defined by different combinations of categorical variables. The table
-is assumed to be in molten format (e.g. see \code{reshape::melt}), with a single value column. This function will then proceed to normalize the data
-based on the value identified by a categorical variable, then normalize the normalized data again by another value etc. (see below for Details)
+is assumed to be in molten format (e.g. see \code{reshape2::melt}), with variable and value columns identifying observations. 
+This function will then proceed to normalize the data based on the value identified by a categorical variable, 
+then normalize the normalized data again by another value etc. (see below for Details)
+At each step of the normalization the table is grouped using the \code{variable.col}, \code{subject.col} and all the columns
+in \code{names(norm.template)}. After this grouping, for every group, there can be only one row for the value of the current grouping
+variable that has been selected as a basis for normalization. In other words the function will not allow you to normalize a vector of values
+by another vector of values, it will only allow normalization of a vector by an individual number. This is done to prevent the result to depend
+on the ordering of the table.
 }
 \details{
-For this function to work the inputs need to satisfy a number of conditions
-
-  \itemize{
-    \item{The input table needs to be in molten format (i.e. see \code{reshape::melt}). There need to be \code{variable} and
-      \code{value} columns identifying the variables that will be normalized and their values}
-    \item{The remaining columns of the input table should all be categorical variables (either strings or factors), identifying different
-      subsets of rows}
-    \item{At each step of the normalization the table is grouped using the \code{variable}, \code{subject.var} and all the columns
-      in \code{names(norm.template)}. After this grouping, for every group, there can be only one row for the value of the current grouping
-      variable that has been selected as a basis for normalization. In other words the function will not allow you to normalize a vector of values
-      by another vector of values, it will only allow normalization of a vector by an individual number. This is done to prevent the result to depend
-      on the ordering of the table.}
-  }
 An example should help clarify the working of this function. Assume you have a dataset where different variables have been measured for multiple subjects,
 under different stimulation conditions, and at different timepoints. For each variable you want the data at each timepoint to be normalized by the value in
 the "unstim" condition. Then you want this data to be further normalized by the value at the "baseline" timepoint. Assume \code{tab} is in molten

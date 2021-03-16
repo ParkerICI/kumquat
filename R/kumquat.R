@@ -10,22 +10,15 @@ NULL
 #' Normalize numeric data in multiple steps
 #'
 #' This function normalizes numeric data in a table in multiple steps, based on groups defined by different combinations of categorical variables. The table
-#' is assumed to be in molten format (e.g. see \code{reshape::melt}), with a single value column. This function will then proceed to normalize the data
-#' based on the value identified by a categorical variable, then normalize the normalized data again by another value etc. (see below for Details)
-#'
-#' For this function to work the inputs need to satisfy a number of conditions
-#'
-#'   \itemize{
-#'     \item{The input table needs to be in molten format (i.e. see \code{reshape::melt}). There need to be \code{variable} and
-#'       \code{value} columns identifying the variables that will be normalized and their values}
-#'     \item{The remaining columns of the input table should all be categorical variables (either strings or factors), identifying different
-#'       subsets of rows}
-#'     \item{At each step of the normalization the table is grouped using the \code{variable}, \code{subject.var} and all the columns
-#'       in \code{names(norm.template)}. After this grouping, for every group, there can be only one row for the value of the current grouping
-#'       variable that has been selected as a basis for normalization. In other words the function will not allow you to normalize a vector of values
-#'       by another vector of values, it will only allow normalization of a vector by an individual number. This is done to prevent the result to depend
-#'       on the ordering of the table.}
-#'   }
+#' is assumed to be in molten format (e.g. see \code{reshape2::melt}), with variable and value columns identifying observations. 
+#' This function will then proceed to normalize the data based on the value identified by a categorical variable, 
+#' then normalize the normalized data again by another value etc. (see below for Details)
+#' At each step of the normalization the table is grouped using the \code{variable.col}, \code{subject.col} and all the columns
+#' in \code{names(norm.template)}. After this grouping, for every group, there can be only one row for the value of the current grouping
+#' variable that has been selected as a basis for normalization. In other words the function will not allow you to normalize a vector of values
+#' by another vector of values, it will only allow normalization of a vector by an individual number. This is done to prevent the result to depend
+#' on the ordering of the table.
+#' 
 #' An example should help clarify the working of this function. Assume you have a dataset where different variables have been measured for multiple subjects,
 #' under different stimulation conditions, and at different timepoints. For each variable you want the data at each timepoint to be normalized by the value in
 #' the "unstim" condition. Then you want this data to be further normalized by the value at the "baseline" timepoint. Assume \code{tab} is in molten
@@ -42,7 +35,7 @@ NULL
 #' to identify a single value for normalization, since you have multiple conditions for each timepoint and viceversa.
 #'
 #' @param tab The input \code{data.frame} See the details for assumption about its structure
-#' @param norm.template A named list idenfying which categorical variables should be used to group data for normalization. The values in the list
+#' @param norm.template A named list identyfying which categorical variables should be used to group data for normalization. The values in the list
 #'   represent the value of the corresponding variable that identify the rows that are used as reference for normalization at each step. The data will be normalized
 #'   in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)
 #' @param subject.var The name of the column that identifies different subjects in \code{tab}. All normalization operations are done within the subgroups
@@ -51,15 +44,15 @@ NULL
 #'
 #'
 #' @export
-multistep_normalize <- function(tab, norm.template, subject.var) {
+multistep_normalize <- function(tab, norm.template, subject.col, variable.col = "variable", value.col = "value") {
     var.names <- names(norm.template)
     var.values <- unlist(norm.template, use.names = F)
     
     ret <- tab
     
     for(i in 1:length(var.names)) {
-        variable.names <- c("variable", subject.var, var.names[var.names != var.names[i]])
-        mutate.s <- sprintf("value / value[%s == '%s']", var.names[i], var.values[i])
+        variable.names <- c(variable.col, subject.col, var.names[var.names != var.names[i]])
+        mutate.s <- sprintf("%s / %s[%s == '%s']", value.col, value.col, var.names[i], var.values[i])
         filter.s <- sprintf("%s != '%s'", var.names[i], var.values[i])
         
         # Check for uniqueness of normalization values
@@ -73,7 +66,7 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
         
         
         ret <- dplyr::group_by_(ret, .dots = variable.names) %>%
-            dplyr::mutate_(.dots = setNames(mutate.s, "value")) %>%
+            dplyr::mutate_(.dots = setNames(mutate.s, value.col)) %>%
             dplyr::filter_(.dots = filter.s)
         
     }
@@ -84,18 +77,18 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 
 #' Calculate cluster features for model building
 #'
-#' This function takes input data and a table of sample metadata, and calculates cluster features to be used for model building
+#' This function takes input data and (optionally) a table of sample metadata, and rearranges data into a matrix of features to be used for model building
 #'
-#' The input table needs to be in molten format (i.e. see \code{reshape::melt}). There need to be \code{variable} and
-#' \code{value} columns identifying variables and their values (for instance cell population abundances). The
-#' \code{metadata.tab} must contain a column (identified by the \code{filename.col} function argument), which matches the names of the samples in
+#' The input table needs to be in molten format (i.e. see \code{reshape2::melt}) with \code{variable.col} and
+#' \code{value.col} columns identifying variables and their values (for instance cell population abundances). The
+#' \code{metadata.tab}, if provided, must contain a column (identified by the \code{sample.col} function argument), which matches the names of the samples in
 #' \code{tab} (i.e. the part after the \code{@}, "sample1" in the above example). The rest of the columns in \code{metadata.tab} represent file-level
 #' metadata, which is used to identify the data corresponding to a given combination of predictors (see below)
 #' An example will help clarify the working of this function. Suppose you have collected data from multiple patients at multiple timepoints and under multiple
 #' stimulation conditions.
 #' In this case the \code{metadata.tab} would look like this
 #' \itemize{
-#'   \item{\code{file}}{ The names of the data files that contain data for each sample. These must match the names in the clustering results (see above)}
+#'   \item{\code{sample.id}}{ This is used to merge sample metadata with the input data (see above)}
 #'   \item{\code{timepoint}}{ The timepoint information}
 #'   \item{\code{condition}}{ The stimulation condition}
 #'   \item{\code{subject}}{ The subjet each file was derived from}
@@ -109,54 +102,44 @@ multistep_normalize <- function(tab, norm.template, subject.var) {
 #'         the function with \code{predictors = c("condition")} and \code{endpoint.grouping = c("sample", "timepoint")}. The features in the resulting output
 #'         would look like \code{cluster_1_feature1_condition}
 #' }
+#' Internally this function uses \code{reshape2::dcast} to structure the data in the appropriate format with the following formula (see the \code{reshape2::dcast}
+#' documentation for details on how the formula is interpreted): 
+#' \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
 #'
-#' @param tab A \code{data.frame} representing clustering results, as produced by \code{cluster_data} (see Details)
-#' @param metadata.tab A \code{data.frame} containing sample metadata (see Details)
-#' @param features.names The name of the features in \code{tab} that are to be included in the output. These names correspond to the portion before the \code{@}
-#'   in \code{names(tab)}
-#' @param out.format The format of the return value, see below for detail
-#' @param predictors Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify predictors.
-#' @param endpoint.grouping Only used if \code{out.format == "table"}. Columns in \code{metadata.tab} that identify the grouping of the response variable
-#'   (see Details). The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every row in \code{metadata.tab}.
+#' @param tab A \code{data.frame} of data in "molten" format (see Details)
+#' @param metadata.tab Optional. A \code{data.frame} containing sample-level metadata to be merged with \code{tab} (see Details)
+#' @param predictors Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify predictors. 
+#'   The data will be processed using \code{reshape2::dcast}
+#'   according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+#' @param endpoint.grouping  Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify the grouping of the endpoint
+#'   (see Details). The data will be processed using \code{reshape2::dcast}
+#'   according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+#'   The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every value in \code{tab}
 #'   The function will throw an error if this is not the case.
-#' @param filename.col The name of the column in \code{metadata.tab} that is used to identify the file names in tab
-#' @return Returns a data frame whose format depends on the value of the \code{out.format} parameter
-#'   \itemize{
-#'     \item{table}: each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
-#'     cluster features, which are combinations of the levels of the \code{predictors} for each feature specified in \code{features.names}
-#'     \item{tidy}: there is a single numeric column, and all the other columns represent variables whose combinations uniquely identify each observation (i.e. each row)
-#'   }
+#' @param sample.col Optional, only used if \code{metadata.tab} is provided. The name of the column that will be used to 
+#'   merge \code{tab} with \code{metadata.tab} 
+#' @return Returns a matrix where each row corresponds to a combination of the levels of the variables specified in \code{endpoint.grouping}, and the columns are
+#'       numeric features corresponding to combinations of the levels of the \code{predictors} 
 #' @export
 
-get_cluster_features <- function(tab, features.names, predictors = NULL, metadata.tab = NULL,
-                                 endpoint.grouping = NULL, sample.col = "sample.id", transform.popsize = TRUE) {
-    #out.format <- match.arg(out.format, c("table", "tidy"))
-    #m <- reshape_cluster_features(tab, features.names, transform.popsize)
-    
-    #df <- reshape::melt(m, varnames = c(filename.col, "variable"))
-    
-    # Restore the original value of filename.col
-    #names(df) <- gsub(make.names(filename.col), filename.col, names(df))
-    
+get_cluster_features <- function(tab, predictors = NULL, metadata.tab = NULL, variable.col = "variable", value.col = "value", 
+                                 endpoint.grouping = NULL, sample.col = "sample.id") {
     df <- tab
-    df <- merge(df, metadata.tab, by = sample.col)
+    if(!is.null(metadata.tab))
+        df <- merge(df, metadata.tab, by = sample.col)
     
     ret <- NULL
     
-    
-    if(is.null(predictors) || is.null(endpoint.grouping))
-        stop("You must specifiy predictors and endpoint.grouping when out.format == 'table'")
-    
     formula.exp <- as.formula(sprintf("%s ~ %s", paste(endpoint.grouping, collapse = "+"),
-                                      paste(c("variable", predictors), collapse = "+")))
+                                      paste(c(variable.col, predictors), collapse = "+")))
     
-    #Stop if the combination of response grouping and predictors does not uniquely identify each file
-    if(nrow(df) != nrow(unique(df[, c("variable", predictors, endpoint.grouping)])))
+    if(nrow(df) != nrow(unique(df[, c(variable.col, predictors, endpoint.grouping)])))
         stop("The combination of predictors and endpoint.grouping does not uniquely identify every row in metadata.tab")
-    ret <- reshape::cast(df, formula.exp)
-  
+    ret <- reshape2::dcast(df, formula.exp)
     
-    return(data.frame(ret, check.names = FALSE, stringsAsFactors = FALSE))
+    m <- ret[, !(names(ret) %in% endpoint.grouping)]
+    row.names(m) <- paste(ret[, endpoint.grouping], sep = "_")
+    return(as.matrix(m))
 }
 
 

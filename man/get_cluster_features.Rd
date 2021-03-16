@@ -8,8 +8,8 @@ get_cluster_features(
   tab,
   predictors = NULL,
   metadata.tab = NULL,
-  variable.col = "variable",
-  value.col = "value",
+  variable.var = "variable",
+  value.var = "value",
   endpoint.grouping = NULL,
   sample.col = "sample.id"
 )
@@ -19,13 +19,17 @@ get_cluster_features(
 
 \item{predictors}{Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify predictors. 
 The data will be processed using \code{reshape2::dcast}
-according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}}
+according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.var + predictors1 + predictors2 + ...}}
 
 \item{metadata.tab}{Optional. A \code{data.frame} containing sample-level metadata to be merged with \code{tab} (see Details)}
 
+\item{variable.var}{The column in \code{tab} that identifies the variable}
+
+\item{value.var}{The column in \code{tab} that identfies the value}
+
 \item{endpoint.grouping}{Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify the grouping of the endpoint
 (see Details). The data will be processed using \code{reshape2::dcast}
-according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.var + predictors1 + predictors2 + ...}
 The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every value in \code{tab}
 The function will throw an error if this is not the case.}
 
@@ -40,8 +44,8 @@ Returns a matrix where each row corresponds to a combination of the levels of th
 This function takes input data and (optionally) a table of sample metadata, and rearranges data into a matrix of features to be used for model building
 }
 \details{
-The input table needs to be in molten format (i.e. see \code{reshape2::melt}) with \code{variable.col} and
-\code{value.col} columns identifying variables and their values (for instance cell population abundances). The
+The input table needs to be in molten format (i.e. see \code{reshape2::melt}) with \code{variable.var} and
+\code{value.var} columns identifying variables and their values (for instance cell population abundances). The
 \code{metadata.tab}, if provided, must contain a column (identified by the \code{sample.col} function argument), which matches the names of the samples in
 \code{tab} (i.e. the part after the \code{@}, "sample1" in the above example). The rest of the columns in \code{metadata.tab} represent file-level
 metadata, which is used to identify the data corresponding to a given combination of predictors (see below)
@@ -65,5 +69,5 @@ Let's assume a few different scenarios.
 }
 Internally this function uses \code{reshape2::dcast} to structure the data in the appropriate format with the following formula (see the \code{reshape2::dcast}
 documentation for details on how the formula is interpreted): 
-\code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+\code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.var + predictors1 + predictors2 + ...}
 }

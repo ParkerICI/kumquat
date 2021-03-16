@@ -5,7 +5,7 @@
 \title{High level wrapper}
 \usage{
 run_analysis(
-  citrus.features,
+  features,
   endpoint,
   output.directory,
   model.type,

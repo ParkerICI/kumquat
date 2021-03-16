@@ -8,8 +8,8 @@ multistep_normalize(
   tab,
   norm.template,
   subject.col,
-  variable.col = "variable",
-  value.col = "value"
+  variable.var = "variable",
+  value.var = "value"
 )
 }
 \arguments{
@@ -20,14 +20,14 @@ represent the value of the corresponding variable that identify the rows that ar
 in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)}
 
 \item{subject.var}{The name of the column that identifies different subjects in \code{tab}. All normalization operations are done within the subgroups
-identified by this variable (i.e. data will never be normalized across subsets idenfied by different values of subject.var)}
+identified by this variable (i.e. data will never be normalized across subsets identified by different values of subject.var)}
 }
 \description{
 This function normalizes numeric data in a table in multiple steps, based on groups defined by different combinations of categorical variables. The table
 is assumed to be in molten format (e.g. see \code{reshape2::melt}), with variable and value columns identifying observations. 
 This function will then proceed to normalize the data based on the value identified by a categorical variable, 
 then normalize the normalized data again by another value etc. (see below for Details)
-At each step of the normalization the table is grouped using the \code{variable.col}, \code{subject.col} and all the columns
+At each step of the normalization the table is grouped using the \code{variable.var}, \code{subject.col} and all the columns
 in \code{names(norm.template)}. After this grouping, for every group, there can be only one row for the value of the current grouping
 variable that has been selected as a basis for normalization. In other words the function will not allow you to normalize a vector of values
 by another vector of values, it will only allow normalization of a vector by an individual number. This is done to prevent the result to depend

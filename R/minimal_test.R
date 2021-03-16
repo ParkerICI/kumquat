@@ -27,13 +27,13 @@ minimal_test3 <- function() {
       endpoint.grouping = "subject.id"
     )
     
-    ff <- convert_to_citrus_featureset(features.citrus)
     
     endpoint <- metadata.tab[!duplicated(metadata.tab$subject.id), ]
     row.names(endpoint) <- endpoint$subject.id
     
-    sam.model <- run_analysis(ff, endpoint$psa.response, "./", "pamr")
-    
+    pam.model <- run_analysis(features.citrus, endpoint$psa.response, "./", "pamr")
+    sam.model <- run_analysis(features.citrus, endpoint$psa.response, "./", "pamr")
+    glmnet.model <- run_analysis(features.citrus, endpoint$psa.response, "./", "glmnet")
     
 }
 

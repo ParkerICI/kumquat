@@ -13,7 +13,7 @@ NULL
 #' is assumed to be in molten format (e.g. see \code{reshape2::melt}), with variable and value columns identifying observations. 
 #' This function will then proceed to normalize the data based on the value identified by a categorical variable, 
 #' then normalize the normalized data again by another value etc. (see below for Details)
-#' At each step of the normalization the table is grouped using the \code{variable.col}, \code{subject.col} and all the columns
+#' At each step of the normalization the table is grouped using the \code{variable.var}, \code{subject.col} and all the columns
 #' in \code{names(norm.template)}. After this grouping, for every group, there can be only one row for the value of the current grouping
 #' variable that has been selected as a basis for normalization. In other words the function will not allow you to normalize a vector of values
 #' by another vector of values, it will only allow normalization of a vector by an individual number. This is done to prevent the result to depend
@@ -39,20 +39,20 @@ NULL
 #'   represent the value of the corresponding variable that identify the rows that are used as reference for normalization at each step. The data will be normalized
 #'   in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)
 #' @param subject.var The name of the column that identifies different subjects in \code{tab}. All normalization operations are done within the subgroups
-#'   identified by this variable (i.e. data will never be normalized across subsets idenfied by different values of subject.var)
+#'   identified by this variable (i.e. data will never be normalized across subsets identified by different values of subject.var)
 #'
 #'
 #'
 #' @export
-multistep_normalize <- function(tab, norm.template, subject.col, variable.col = "variable", value.col = "value") {
+multistep_normalize <- function(tab, norm.template, subject.col, variable.var = "variable", value.var = "value") {
     var.names <- names(norm.template)
     var.values <- unlist(norm.template, use.names = F)
     
     ret <- tab
     
     for(i in 1:length(var.names)) {
-        variable.names <- c(variable.col, subject.col, var.names[var.names != var.names[i]])
-        mutate.s <- sprintf("%s / %s[%s == '%s']", value.col, value.col, var.names[i], var.values[i])
+        variable.names <- c(variable.var, subject.col, var.names[var.names != var.names[i]])
+        mutate.s <- sprintf("%s / %s[%s == '%s']", value.var, value.var, var.names[i], var.values[i])
         filter.s <- sprintf("%s != '%s'", var.names[i], var.values[i])
         
         # Check for uniqueness of normalization values
@@ -66,8 +66,8 @@ multistep_normalize <- function(tab, norm.template, subject.col, variable.col = 
         
         
         ret <- dplyr::group_by_(ret, .dots = variable.names) %>%
-            dplyr::mutate_(.dots = setNames(mutate.s, value.col)) %>%
-            dplyr::filter_(.dots = filter.s)
+                   dplyr::mutate_(.dots = setNames(mutate.s, value.var)) %>%
+                   dplyr::filter_(.dots = filter.s)
         
     }
     
@@ -79,8 +79,8 @@ multistep_normalize <- function(tab, norm.template, subject.col, variable.col = 
 #'
 #' This function takes input data and (optionally) a table of sample metadata, and rearranges data into a matrix of features to be used for model building
 #'
-#' The input table needs to be in molten format (i.e. see \code{reshape2::melt}) with \code{variable.col} and
-#' \code{value.col} columns identifying variables and their values (for instance cell population abundances). The
+#' The input table needs to be in molten format (i.e. see \code{reshape2::melt}) with \code{variable.var} and
+#' \code{value.var} columns identifying variables and their values (for instance cell population abundances). The
 #' \code{metadata.tab}, if provided, must contain a column (identified by the \code{sample.col} function argument), which matches the names of the samples in
 #' \code{tab} (i.e. the part after the \code{@}, "sample1" in the above example). The rest of the columns in \code{metadata.tab} represent file-level
 #' metadata, which is used to identify the data corresponding to a given combination of predictors (see below)
@@ -104,16 +104,18 @@ multistep_normalize <- function(tab, norm.template, subject.col, variable.col = 
 #' }
 #' Internally this function uses \code{reshape2::dcast} to structure the data in the appropriate format with the following formula (see the \code{reshape2::dcast}
 #' documentation for details on how the formula is interpreted): 
-#' \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+#' \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.var + predictors1 + predictors2 + ...}
 #'
 #' @param tab A \code{data.frame} of data in "molten" format (see Details)
+#' @param variable.var The column in \code{tab} that identifies the variable
+#' @param value.var The column in \code{tab} that identfies the value
 #' @param metadata.tab Optional. A \code{data.frame} containing sample-level metadata to be merged with \code{tab} (see Details)
 #' @param predictors Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify predictors. 
 #'   The data will be processed using \code{reshape2::dcast}
-#'   according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+#'   according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.var + predictors1 + predictors2 + ...}
 #' @param endpoint.grouping  Columns in \code{tab} (after optionally merging with \code{metadata.tab}) that identify the grouping of the endpoint
 #'   (see Details). The data will be processed using \code{reshape2::dcast}
-#'   according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.col + predictors1 + predictors2 + ...}
+#'   according to the formula \code{endpoint.grouping1 + endpoint.grouping2 + ... ~ variable.var + predictors1 + predictors2 + ...}
 #'   The combination of \code{predictors} and \code{endpoint.grouping} must uniquely identify every value in \code{tab}
 #'   The function will throw an error if this is not the case.
 #' @param sample.col Optional, only used if \code{metadata.tab} is provided. The name of the column that will be used to 
@@ -122,7 +124,7 @@ multistep_normalize <- function(tab, norm.template, subject.col, variable.col = 
 #'       numeric features corresponding to combinations of the levels of the \code{predictors} 
 #' @export
 
-get_cluster_features <- function(tab, predictors = NULL, metadata.tab = NULL, variable.col = "variable", value.col = "value", 
+get_cluster_features <- function(tab, predictors = NULL, metadata.tab = NULL, variable.var = "variable", value.var = "value", 
                                  endpoint.grouping = NULL, sample.col = "sample.id") {
     df <- tab
     if(!is.null(metadata.tab))
@@ -131,9 +133,9 @@ get_cluster_features <- function(tab, predictors = NULL, metadata.tab = NULL, va
     ret <- NULL
     
     formula.exp <- as.formula(sprintf("%s ~ %s", paste(endpoint.grouping, collapse = "+"),
-                                      paste(c(variable.col, predictors), collapse = "+")))
+                                      paste(c(variable.var, predictors), collapse = "+")))
     
-    if(nrow(df) != nrow(unique(df[, c(variable.col, predictors, endpoint.grouping)])))
+    if(nrow(df) != nrow(unique(df[, c(variable.var, predictors, endpoint.grouping)])))
         stop("The combination of predictors and endpoint.grouping does not uniquely identify every row in metadata.tab")
     ret <- reshape2::dcast(df, formula.exp)
     

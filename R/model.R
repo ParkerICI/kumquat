@@ -1,8 +1,3 @@
-# @export
-#convert_to_citrus_featureset <- function(tab) {
-#    return(list(allFeatures = ret, nFolds = 1))
-#}
-
 #' Calculate a prediction model
 #' 
 #' This function is the main wrapper around the Citrus model building functionality
@@ -18,7 +13,10 @@
 #' 
 #' @export 
 get_model <- function(features, endpoint, model.type) {
-    citrus.features <- list(allFeatures = features, nFolds = 1)
+    if(is.matrix(features))
+        citrus.features <- list(allFeatures = features, nFolds = 1)
+    else
+        citrus.features <- features
     
     family <- NULL
     
@@ -44,8 +42,9 @@ get_model <- function(features, endpoint, model.type) {
 #' (\code{\link{plot_error_rate}}, \code{\link{plot_stratifying_features}}, \code{\link{plot_stratifying_clusters}})
 #' 
 #' @export
-run_analysis <- function(citrus.features, endpoint, output.directory, model.type, clusters.data = NULL) {
-
+run_analysis <- function(features, endpoint, output.directory, model.type, clusters.data = NULL) {
+    citrus.features <- list(allFeatures = features, nFolds = 1)
+    
     out.dir <- file.path(output.directory, sprintf("%s_results", model.type))
     dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
     message("Calculating model")

@@ -1,18 +1,3 @@
-#' @export
-convert_to_citrus_featureset <- function(tab) {
-    endpoint.grouping <- grep("cluster_", names(tab), invert = TRUE, value = TRUE)
-    
-    rnames <- do.call(paste, list(tab[, endpoint.grouping], sep = "_"))
-    cnames <- setdiff(colnames(tab), endpoint.grouping)
-    ret <- as.matrix(tab[, cnames])
-    row.names(ret) <- rnames
-    colnames(ret) <- cnames
-    
-    return(list(allFeatures = ret, nFolds = 1))
-    
-    return(ret)
-}
-
 #' Calculate a prediction model
 #' 
 #' This function is the main wrapper around the Citrus model building functionality
@@ -27,7 +12,12 @@ convert_to_citrus_featureset <- function(tab) {
 #' @inherit citrus.endpointRegress return
 #' 
 #' @export 
-get_model <- function(citrus.features, endpoint, model.type) {
+get_model <- function(features, endpoint, model.type) {
+    if(is.matrix(features))
+        citrus.features <- list(allFeatures = features, nFolds = 1)
+    else
+        citrus.features <- features
+    
     family <- NULL
     
     if (is.character(endpoint) || is.factor(endpoint)) {
@@ -52,8 +42,9 @@ get_model <- function(citrus.features, endpoint, model.type) {
 #' (\code{\link{plot_error_rate}}, \code{\link{plot_stratifying_features}}, \code{\link{plot_stratifying_clusters}})
 #' 
 #' @export
-run_analysis <- function(citrus.features, endpoint, output.directory, model.type, clusters.data = NULL) {
-
+run_analysis <- function(features, endpoint, output.directory, model.type, clusters.data = NULL) {
+    citrus.features <- list(allFeatures = features, nFolds = 1)
+    
     out.dir <- file.path(output.directory, sprintf("%s_results", model.type))
     dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
     message("Calculating model")

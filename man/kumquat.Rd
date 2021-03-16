@@ -3,7 +3,6 @@
 \docType{package}
 \name{kumquat}
 \alias{kumquat}
-\alias{kumquat-package}
 \title{kumquat: Identification of stratifying subpopulations in Flow Cytometry Data (based on the Citrus package)}
 \description{
 Automated identification of clusters whose behavior differs between sample groups.

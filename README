@@ -1,10 +1,2 @@
-- install impute from bioconductor
-- install samr manually from the archive source
-
-
-PAMR simply returns a list of significant clusters
-
-
-Explain the cvPoint business
-
+This package is a stripped-down version of the [Citrus](https://github.com/nolanlab/citrus) package, which removes all the clustering and GUI code, and focuses exclusively on model building
 

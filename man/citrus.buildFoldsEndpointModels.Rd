@@ -4,8 +4,14 @@
 \alias{citrus.buildFoldsEndpointModels}
 \title{Build models from each fold of clustering}
 \usage{
-citrus.buildFoldsEndpointModels(type, citrus.foldFeatureSet, labels,
-  regularizationThresholds = NULL, family = "classification", ...)
+citrus.buildFoldsEndpointModels(
+  type,
+  citrus.foldFeatureSet,
+  labels,
+  regularizationThresholds = NULL,
+  family = "classification",
+  ...
+)
 }
 \arguments{
 \item{type}{Model Type. Valid options are \code{pamr}, \code{glmnet}, and \code{sam}.}

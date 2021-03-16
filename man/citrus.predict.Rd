@@ -4,9 +4,7 @@
 \name{citrus.predict}
 \alias{citrus.predict}
 \alias{citrus.predict.classification}
-\alias{citrus.predict}
 \alias{citrus.predict.continuous}
-\alias{citrus.predict}
 \title{Predict labels of new feature set}
 \usage{
 citrus.predict.classification(citrus.endpointModel, newFeatures)

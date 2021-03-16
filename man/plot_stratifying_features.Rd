@@ -4,8 +4,12 @@
 \alias{plot_stratifying_features}
 \title{Plot stratifying features}
 \usage{
-plot_stratifying_features(citrus.model, output.dir, by.cluster = FALSE,
-  all.features = FALSE)
+plot_stratifying_features(
+  citrus.model,
+  output.dir,
+  by.cluster = FALSE,
+  all.features = FALSE
+)
 }
 \arguments{
 \item{citrus.model}{An object of class \code{citrus.regressionResult}, as returned from

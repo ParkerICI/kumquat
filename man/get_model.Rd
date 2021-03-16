@@ -4,7 +4,7 @@
 \alias{get_model}
 \title{Calculate a prediction model}
 \usage{
-get_model(citrus.features, endpoint, model.type)
+get_model(features, endpoint, model.type)
 }
 \arguments{
 \item{endpoint}{A vector of length equal to \code{nrow(features)} containing 

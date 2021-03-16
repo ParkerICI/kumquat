@@ -4,8 +4,13 @@
 \alias{plot_stratifying_clusters}
 \title{Plotting stratifying clusters}
 \usage{
-plot_stratifying_clusters(citrus.model, clusters.data, output.dir,
-  col.names = names(clusters.data), by.cluster = FALSE)
+plot_stratifying_clusters(
+  citrus.model,
+  clusters.data,
+  output.dir,
+  col.names = names(clusters.data),
+  by.cluster = FALSE
+)
 }
 \arguments{
 \item{citrus.model}{An object of class \code{citrus.regressionResult}, as returned from

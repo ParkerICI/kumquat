@@ -10,3 +10,24 @@ Proc Natl Acad Sci U S A. 2014 Jul 1;111(26):E2770-7. doi: 10.1073/pnas.14087921
 
 
 
+# Installation
+
+To install `kumquat` first intall the Bioconductor `impute` package
+
+```R
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("impute")
+```
+
+and then install `kumquat` using the `devtools` package as follows
+
+```R
+devtools::install_github("ParkerICI/kumquat")
+```
+
+
+
+
+

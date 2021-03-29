@@ -1,5 +1,7 @@
 This package is a stripped-down version of the [Citrus](https://github.com/nolanlab/citrus) package, which removes all the clustering and GUI code, and focuses exclusively on model building
 
+It can be used to build models that associate features from single-cell data (e.g. the abundance of a specific cluster or gated cell population) to a clinical endpoint of interest (e.g. response to therapy)
+
 The original reference for Citrus is
 
 ```

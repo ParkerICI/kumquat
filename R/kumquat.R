@@ -41,11 +41,14 @@ NULL
 #'   in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)
 #' @param subject.var The name of the column that identifies different subjects in \code{tab}. All normalization operations are done within the subgroups
 #'   identified by this variable (i.e. data will never be normalized across subsets identified by different values of subject.var)
+#' @param remove.normalization.baseline If \code{TRUE} the observations that have been
+#'   used as baseline for normalization are removed at each normalization step
 #'
 #'
 #'
 #' @export
-multistep_normalize <- function(tab, norm.template, subject.col, variable.var = "variable", value.var = "value") {
+multistep_normalize <- function(tab, norm.template, subject.col, 
+                                variable.var = "variable", value.var = "value", remove.normalization.baseline = TRUE) {
     var.names <- names(norm.template)
     var.values <- unlist(norm.template, use.names = F)
     
@@ -67,12 +70,14 @@ multistep_normalize <- function(tab, norm.template, subject.col, variable.var = 
         
         
         ret <- dplyr::group_by_(ret, .dots = variable.names) %>%
-                   dplyr::mutate_(.dots = setNames(mutate.s, value.var)) %>%
-                   dplyr::filter_(.dots = filter.s)
+                   dplyr::mutate_(.dots = setNames(mutate.s, value.var))
+                   
+        if(remove.normalization.baseline)
+            ret <- ret %>% dplyr::filter_(.dots = filter.s)
         
     }
     
-    return(ret)
+    return(as.data.frame(ret))
 }
 
 

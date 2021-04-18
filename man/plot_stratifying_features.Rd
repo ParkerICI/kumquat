@@ -22,7 +22,7 @@ sub-directories will be created in \code{output.dir}}
 for each cluster, otherwise or a single plot with all the clusters. 
 The latter option may take quite long to plot if there are several clusters}
 
-\item{all.features}{Wether to plot only the stratifying features (default) or all the features}
+\item{all.features}{Whether to plot only the stratifying features (default) or all the features}
 }
 \description{
 Plot stratifying features

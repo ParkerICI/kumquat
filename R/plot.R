@@ -49,7 +49,7 @@ plot_error_rate <- function(citrus.model, output.file) {
 #' Plot stratifying features
 #' 
 #' @inheritParams plot_stratifying_clusters
-#' @param all.features Wether to plot only the stratifying features (default) or all the features
+#' @param all.features Whether to plot only the stratifying features (default) or all the features
 #' @export
 plot_stratifying_features <- function(citrus.model, output.dir, by.cluster = FALSE, all.features = FALSE) {
     do.call(paste("citrus.plotModelDifferentialFeatures", citrus.model$family, 

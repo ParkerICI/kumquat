@@ -15,7 +15,7 @@ multistep_normalize(
 \arguments{
 \item{tab}{The input \code{data.frame} See the details for assumption about its structure}
 
-\item{norm.template}{A named list identyfying which categorical variables should be used to group data for normalization. The values in the list
+\item{norm.template}{A named list identifying which categorical variables should be used to group data for normalization. The values in the list
 represent the value of the corresponding variable that identify the rows that are used as reference for normalization at each step. The data will be normalized
 in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)}
 

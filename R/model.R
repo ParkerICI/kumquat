@@ -61,6 +61,7 @@ run_analysis <- function(features, endpoint, output.directory, model.type, clust
         plot_stratifying_clusters(citrus.res, clusters.data = clusters.data, output.dir = out.dir, 
                                   by.cluster = TRUE)
     }
+    saveRDS(citrus.res, file = file.path(out.dir, "model.rds"))
     
     
     return(invisible(citrus.res))

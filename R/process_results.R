@@ -2,6 +2,7 @@
 
 #' @export
 get_signifcant_features_matrix <- function(sam.model) {
+    browser()
     tabs.list <- sam.model$siggenes.table[c("genes.up", "genes.lo")]
     
     ret <- lapply(tabs.list, function(x) {

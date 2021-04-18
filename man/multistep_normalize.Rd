@@ -9,7 +9,8 @@ multistep_normalize(
   norm.template,
   subject.col,
   variable.var = "variable",
-  value.var = "value"
+  value.var = "value",
+  remove.normalization.baseline = TRUE
 )
 }
 \arguments{
@@ -18,6 +19,9 @@ multistep_normalize(
 \item{norm.template}{A named list identifying which categorical variables should be used to group data for normalization. The values in the list
 represent the value of the corresponding variable that identify the rows that are used as reference for normalization at each step. The data will be normalized
 in the same order specified by this list (i.e. data will be normalized according to the first variable, then again according to the second etc.)}
+
+\item{remove.normalization.baseline}{If \code{TRUE} the observations that have been
+used as baseline for normalization are removed at each normalization step}
 
 \item{subject.var}{The name of the column that identifies different subjects in \code{tab}. All normalization operations are done within the subgroups
 identified by this variable (i.e. data will never be normalized across subsets identified by different values of subject.var)}

@@ -146,7 +146,7 @@ get_cluster_features <- function(tab, predictors = NULL, metadata.tab = NULL, va
     ret <- reshape2::dcast(df, formula.exp)
     
     m <- ret[, !(names(ret) %in% endpoint.grouping)]
-    row.names(m) <- paste(ret[, endpoint.grouping], sep = "_")
+    row.names(m) <- apply(ret[, endpoint.grouping, drop = FALSE], 1, paste, collapse = "_")
     return(as.matrix(m))
 }
 

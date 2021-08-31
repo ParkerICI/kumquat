@@ -340,11 +340,11 @@ citrus.extractModelFeatures <- function(cvMinima, finalModel, finalFeatures) {
                   geneids = colnames(finalFeatures)), threshold = threshold)
                 f <- as.vector(f[, 1])
                 res[[cvPoint]][["features"]] <- f
-                res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", 
-                  strsplit(f, split = "_"))[, 2])))
+                #res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", 
+                #  strsplit(f, split = "_"))[, 2])))
             } else {
                 res[[cvPoint]][["features"]] <- NULL
-                res[[cvPoint]][["clusters"]] <- NULL
+                #res[[cvPoint]][["clusters"]] <- NULL
             }
             
         } else if (modelType == "glmnet") {
@@ -357,11 +357,11 @@ citrus.extractModelFeatures <- function(cvMinima, finalModel, finalFeatures) {
             }
             if (length(f) > 0) {
                 res[[cvPoint]][["features"]] <- f
-                res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", 
-                  strsplit(f, split = "_"))[, 2])))
+                #res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", 
+                #  strsplit(f, split = "_"))[, 2])))
             } else {
                 res[[cvPoint]][["features"]] <- NULL
-                res[[cvPoint]][["clusters"]] <- NULL
+                #res[[cvPoint]][["clusters"]] <- NULL
             }
         } else if (modelType == "sam") {
             sigGenes <- rbind(finalModel$siggenes.table$genes.up, finalModel$siggenes.table$genes.lo)
@@ -371,11 +371,11 @@ citrus.extractModelFeatures <- function(cvMinima, finalModel, finalFeatures) {
             if (length(f) > 0) {
                 # sigGenes = sigGenes[order(abs(as.numeric(sigGenes[,'Fold Change']))),,drop=F]
                 res[[cvPoint]][["features"]] <- f
-                res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", 
-                  strsplit(f, split = "_"))[, 2])))
+                #res[[cvPoint]][["clusters"]] <- sort(unique(as.numeric(do.call("rbind", 
+                #  strsplit(f, split = "_"))[, 2])))
             } else {
                 res[[cvPoint]][["features"]] <- NULL
-                res[[cvPoint]][["clusters"]] <- NULL
+                #res[[cvPoint]][["clusters"]] <- NULL
             }
         }
     }

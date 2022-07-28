@@ -34,10 +34,10 @@ citrus.buildModel.classification <- function(features, labels, type, regularizat
         model <- glmnet::glmnet(x = features, y = labels, family = family, lambda = regularizationThresholds, 
             alpha = alpha, standardize = standardize)
     } else if (type == "sam") {
-        family <- "Two class unpaired"
-        if (length(unique(labels)) > 2) {
-            family <- "Multiclass"
-        }
+        family <- "Two class paired"
+        # if (length(unique(labels)) > 2) {
+        #     family <- "Multiclass"
+        # }
         noVarianceFeatures <- apply(features, 2, var) == 0
         model <- samr::SAM(x = t(features[, !noVarianceFeatures]), y = labels, resp.type = family, 
             genenames = colnames(features[, !noVarianceFeatures]), nperms = 10000)

@@ -18,13 +18,13 @@ get_model <- function(features, endpoint, model.type) {
     else
         citrus.features <- features
     
-    family <- NULL
+    family <- "classification"
     
-    if (is.character(endpoint) || is.factor(endpoint)) {
-        family <- "classification"
-        endpoint <- as.factor(endpoint)
-        
-    } else family <- "continuous"
+    # if (is.character(endpoint) || is.factor(endpoint)) {
+    #     family <- "classification"
+    #     endpoint <- as.factor(endpoint)
+    #     
+    # } else family <- "continuous"
     
     citrus.res <- citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
                                                  labels = endpoint, family = family)

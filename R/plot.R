@@ -52,6 +52,16 @@ plot_error_rate <- function(citrus.model, output.file) {
 #' @param all.features Whether to plot only the stratifying features (default) or all the features
 #' @export
 plot_stratifying_features <- function(citrus.model, output.dir, by.cluster = FALSE, all.features = FALSE) {
+    print(citrus.model$labels)
+    print(class(citrus.model$labels))
+    if (length(citrus.model$labels) == 2*length(unique(abs(citrus.model$labels))))
+    {
+        citrus.model$labels[citrus.model$labels > 0] <- "unstim"
+        citrus.model$labels[citrus.model$labels < 0] <- "AXA-042 on stim"
+    }
+    print(citrus.model$labels)
+    print(paste("citrus.plotModelDifferentialFeatures", citrus.model$family, 
+                sep = "."))
     do.call(paste("citrus.plotModelDifferentialFeatures", citrus.model$family, 
                   sep = "."), args = list(differentialFeatures = citrus.model$differentialFeatures, 
                                           features = citrus.model$allFeatures, modelOutputDirectory = output.dir, 

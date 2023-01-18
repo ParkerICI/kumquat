@@ -9,10 +9,11 @@
 #'   \code{"classification"}
 #' @param model.type The type of model, either \code{"pamr"}, \code{"sam"} or
 #'   \code{"glmnet"}
+#' @param ... additional arguments
 #' @inherit citrus.endpointRegress return
 #' 
 #' @export 
-get_model <- function(features, endpoint, model.type) {
+get_model <- function(features, endpoint, model.type, ...) {
     if(is.matrix(features))
         citrus.features <- list(allFeatures = features, nFolds = 1)
     else
@@ -20,14 +21,14 @@ get_model <- function(features, endpoint, model.type) {
     
     family <- "classification"
     
-    # if (is.character(endpoint) || is.factor(endpoint)) {
-    #     family <- "classification"
-    #     endpoint <- as.factor(endpoint)
-    #     
-    # } else family <- "continuous"
+    if (is.character(endpoint) || is.factor(endpoint)) {
+        family <- "classification"
+        endpoint <- as.factor(endpoint)
+
+    } else family <- "continuous"
     
     citrus.res <- citrus.endpointRegress(model.type, citrus.foldFeatureSet = citrus.features, 
-                                                 labels = endpoint, family = family)
+                                                 labels = endpoint, family = family, ...)
     
     citrus.res$allFeatures <- citrus.features$allFeatures
     return(citrus.res)
@@ -42,13 +43,13 @@ get_model <- function(features, endpoint, model.type) {
 #' (\code{\link{plot_error_rate}}, \code{\link{plot_stratifying_features}}, \code{\link{plot_stratifying_clusters}})
 #' 
 #' @export
-run_analysis <- function(features, endpoint, output.directory, model.type, clusters.data = NULL) {
+run_analysis <- function(features, endpoint, output.directory, model.type, clusters.data = NULL, ...) {
     citrus.features <- list(allFeatures = features, nFolds = 1)
     
     out.dir <- file.path(output.directory, sprintf("%s_results", model.type))
     dir.create(out.dir, recursive = TRUE, showWarnings = FALSE)
     message("Calculating model")
-    citrus.res <- get_model(citrus.features, endpoint, model.type)
+    citrus.res <- get_model(citrus.features, endpoint, model.type, ...)
     
     message("Plotting model error rate")
     plot_error_rate(citrus.res, file.path(out.dir, "model_error_rate.pdf"))

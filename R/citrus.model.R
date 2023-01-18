@@ -25,7 +25,7 @@ citrus.buildEndpointModel <- function(features, labels, family = "classification
     }
     model <- do.call(paste("citrus.buildModel", family, sep = "."), args = list(features = features, 
         labels = labels, type = type, regularizationThresholds = regularizationThresholds, 
-        ... = ...))
+        ...))
     result <- list(model = model, regularizationThresholds = regularizationThresholds, 
         family = family, type = type)
     class(result) <- "citrus.endpointModel"
